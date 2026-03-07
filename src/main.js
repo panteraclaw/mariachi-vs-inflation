@@ -118,15 +118,16 @@ function createScenes(k, preloadedAssets) {
 
     // Mariachi - above button
     if (mariachiData) {
-      // Scale mariachi to fit nicely (max 300px tall)
+      // Make mariachi the protagonist: bigger and sitting just above the button
+      // Target: up to ~360px tall and ~65% of screen width
       const mariachiScale = Math.min(
-        (480 * 0.5) / mariachiData.width,
-        250 / mariachiData.height
+        (480 * 0.65) / mariachiData.width,
+        360 / mariachiData.height
       );
-      
+
       k.add([
         k.sprite('mariachi'),
-        k.pos(240, 600),
+        k.pos(240, 575),
         k.anchor('center'),
         k.scale(mariachiScale),
         k.z(3),
