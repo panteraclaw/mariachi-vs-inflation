@@ -51,7 +51,9 @@ function initGame(preloadedAssets) {
     background: [15, 40, 60],
     scale: Math.min(window.innerWidth / 480, window.innerHeight / 854),
     letterbox: true,
-    crisp: true,
+    // IMPORTANT: crisp=true makes canvas use pixelated rendering (retro look).
+    // For this game we want smooth / high-quality scaling.
+    crisp: false,
     touchToMouse: true,
     debug: false,
   });
@@ -116,18 +118,17 @@ function createScenes(k, preloadedAssets) {
       ]);
     }
 
-    // Mariachi - above button
+    // Mariachi - make him the PROTAGONIST (bigger + lower)
     if (mariachiData) {
-      // Make mariachi the protagonist: bigger and sitting just above the button
-      // Target: up to ~360px tall and ~65% of screen width
+      // Prefer width-based scale, cap by height so it doesn't cover the logo.
       const mariachiScale = Math.min(
-        (480 * 0.65) / mariachiData.width,
-        360 / mariachiData.height
+        (480 * 0.75) / mariachiData.width, // ~75% of screen width
+        420 / mariachiData.height          // cap height around 420px
       );
 
       k.add([
         k.sprite('mariachi'),
-        k.pos(240, 575),
+        k.pos(240, 650), // lower, almost above the button
         k.anchor('center'),
         k.scale(mariachiScale),
         k.z(3),
