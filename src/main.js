@@ -246,10 +246,10 @@ function createScenes(k, preloadedAssets) {
     helpBtn.onHover(() => k.setCursor('pointer'));
     helpBtn.onHoverEnd(() => k.setCursor('default'));
 
-    // GitHub link button (bottom-center, small)
+    // GitHub logo (bottom-right corner, small)
     const githubBtn = k.add([
-      k.rect(160, 38, { radius: 12 }),
-      k.pos(240, 830),
+      k.circle(22),
+      k.pos(450, 830),
       k.anchor('center'),
       k.color(40, 40, 50),
       k.opacity(0.85),
@@ -259,10 +259,9 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('</> Código', { size: 16 }),
-      k.pos(240, 830),
+      k.text('🐙', { size: 28 }),
+      k.pos(450, 830),
       k.anchor('center'),
-      k.color(200, 200, 220),
       k.z(11),
     ]);
 
@@ -1089,8 +1088,9 @@ function createScenes(k, preloadedAssets) {
       k.z(100),
     ]);
 
-    const heartsText = k.add([
-      k.text('❤❤❤  (daño: 0/3)', { size: 22 }),
+    // Visual health bar (9 mini-hearts = 3 lives x 3 hits each)
+    const healthBar = k.add([
+      k.text('', { size: 18 }),
       k.pos(18, 74),
       k.color(255, 120, 120),
       k.z(100),
@@ -1387,9 +1387,24 @@ function createScenes(k, preloadedAssets) {
       scoreText.text = `Score: ${score}`;
       btcText.text = `BTC: ${bitcoinCounter}`;
 
-      const fullHearts = '❤'.repeat(Math.max(0, hearts));
-      const dmg = `${heartDamage}/3`;
-      heartsText.text = `${fullHearts}  (daño: ${dmg})`;
+      // Visual health: 9 mini-hearts (3 per life, current life shows damage)
+      const totalMiniHearts = hearts * 3 - heartDamage;
+      const maxMiniHearts = 9;
+      
+      let healthDisplay = '';
+      for (let i = 0; i < maxMiniHearts; i++) {
+        if (i < totalMiniHearts) {
+          healthDisplay += '❤';
+        } else {
+          healthDisplay += '🖤';
+        }
+        // Add space every 3 hearts for grouping
+        if ((i + 1) % 3 === 0 && i < maxMiniHearts - 1) {
+          healthDisplay += ' ';
+        }
+      }
+      
+      healthBar.text = healthDisplay;
     }
 
     refreshUI();
