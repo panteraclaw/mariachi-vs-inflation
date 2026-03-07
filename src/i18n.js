@@ -109,6 +109,7 @@ export const i18n = {
     gameover_title: 'GAME OVER',
     gameover_saved: (amount) => `Ahorraste $${amount} pesos cortando la inflación`,
     gameover_btc_saved: 'BTC guardados',
+    gameover_save_prompt: 'Guarda tu puntuación:',
     gameover_input_placeholder: 'Toca para escribir...',
     gameover_input_hint: '⌨ Escribe tu nombre',
     gameover_saved_status: '✓ Guardado!',
@@ -133,6 +134,7 @@ export const i18n = {
     leaderboard_your_score: 'Tu score',
     leaderboard_name_prompt: 'Ingresa tu nombre',
     leaderboard_name_hint: '(Ingresa tu nombre y presiona Enter)',
+    leaderboard_loading: 'Cargando...',
   },
   
   en: {
@@ -244,6 +246,7 @@ export const i18n = {
     gameover_title: 'GAME OVER',
     gameover_saved: (amount) => `You saved $${amount} pesos cutting inflation`,
     gameover_btc_saved: 'BTC saved',
+    gameover_save_prompt: 'Save your score:',
     gameover_input_placeholder: 'Tap to type...',
     gameover_input_hint: '⌨ Type your name',
     gameover_saved_status: '✓ Saved!',
@@ -268,6 +271,7 @@ export const i18n = {
     leaderboard_your_score: 'Your score',
     leaderboard_name_prompt: 'Enter your name',
     leaderboard_name_hint: '(Enter your name and press Enter)',
+    leaderboard_loading: 'Loading...',
   }
 };
 

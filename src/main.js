@@ -70,7 +70,7 @@ function initGame(preloadedAssets) {
   });
 
   k.canvas.classList.add('loaded');
-  
+
   // Load all sprites
   k.loadSprite('background', '/assets/background.png');
   k.loadSprite('background-night', '/assets/background-night.png');
@@ -188,7 +188,7 @@ function createScenes(k, preloadedAssets) {
     if (logoData) {
       // Scale logo a bit bigger (80% of screen width)
       const logoScale = (480 * 0.8) / logoData.width;
-      
+
       k.add([
         k.sprite('logo'),
         k.pos(240, 180),
@@ -502,8 +502,8 @@ function createScenes(k, preloadedAssets) {
           t('tutorial_1_line2'),
           t('tutorial_1_line3'),
         ], [
-          { key: 'tortilla', label: 'Inflación' },
-          { key: 'bitcoin', label: 'Bitcoin' },
+          { key: 'tortilla', label: t('tutorial_1_label_inflation') },
+          { key: 'bitcoin', label: t('tutorial_1_label_bitcoin') },
         ]);
       }
 
@@ -514,11 +514,11 @@ function createScenes(k, preloadedAssets) {
           t('tutorial_2_line3'),
           t('tutorial_2_line4'),
         ], [
-          { key: 'tortilla', label: 'Tortillas' },
-          { key: 'renta', label: 'Renta' },
-          { key: 'gasolina', label: 'Gasolina' },
-          { key: 'canasta', label: 'Canasta' },
-          { key: 'aguacate', label: 'Aguacate' },
+          { key: 'tortilla', label: t('tutorial_2_label_tortillas') },
+          { key: 'renta', label: t('tutorial_2_label_renta') },
+          { key: 'gasolina', label: t('tutorial_2_label_gasolina') },
+          { key: 'canasta', label: t('tutorial_2_label_canasta') },
+          { key: 'aguacate', label: t('tutorial_2_label_aguacate') },
         ]);
       }
 
@@ -528,7 +528,7 @@ function createScenes(k, preloadedAssets) {
           t('tutorial_3_line2'),
           t('tutorial_3_line3'),
         ], [
-          { key: 'bitcoin', label: 'Bitcoin' },
+          { key: 'bitcoin', label: t('tutorial_3_label_bitcoin') },
         ]);
       }
 
@@ -540,10 +540,10 @@ function createScenes(k, preloadedAssets) {
           t('tutorial_4_line4'),
           t('tutorial_4_line5'),
         ], [
-          { key: 'lightning', label: 'x2' },
-          { key: 'bloque', label: 'Freeze' },
-          { key: 'ahorro', label: '+100' },
-          { key: 'nodo', label: '+Vida' },
+          { key: 'lightning', label: t('tutorial_4_label_x2') },
+          { key: 'bloque', label: t('tutorial_4_label_freeze') },
+          { key: 'ahorro', label: t('tutorial_4_label_plus100') },
+          { key: 'nodo', label: t('tutorial_4_label_life') },
         ]);
       }
 
@@ -688,45 +688,24 @@ function createScenes(k, preloadedAssets) {
 
     const learnPages = [
       {
-        title: '1) ¿Qué es la inflación?',
-        body: [
-          'Inflación = los precios suben con el tiempo.',
-          'Eso hace que tu dinero compre menos.',
-          'Aunque ahorres, tu poder adquisitivo puede caer.',
-        ].join('\n\n'),
+        title: t('learn_1_title'),
+        body: t('learn_1_body'),
       },
       {
-        title: '2) ¿Qué es Bitcoin?',
-        body: [
-          'Bitcoin es dinero digital global.',
-          'Tiene oferta fija: solo existirán 21M BTC.',
-          'Nadie puede “imprimir” más para devaluarlo.',
-        ].join('\n\n'),
+        title: t('learn_2_title'),
+        body: t('learn_2_body'),
       },
       {
-        title: '3) ¿Por qué es refugio vs inflación?',
-        body: [
-          'Si algo es escaso y la demanda crece, su valor tiende a sostenerse o subir.',
-          'El dinero tradicional (pesos, dólares) suele emitirse más con el tiempo → tu ahorro se diluye.',
-          'Bitcoin es escaso por diseño → puede proteger tu ahorro a largo plazo.',
-        ].join('\n\n'),
+        title: t('learn_3_title'),
+        body: t('learn_3_body'),
       },
       {
-        title: '4) Coordinación ciudadana descentralizada',
-        body: [
-          'No depende de un banco o gobierno.',
-          'Miles de nodos verifican reglas y evitan trampas.',
-          'Es una red abierta: cualquiera puede participar y validar.',
-        ].join('\n\n'),
+        title: t('learn_4_title'),
+        body: t('learn_4_body'),
       },
       {
-        title: '5) En este juego (resumen)',
-        body: [
-          'Corta INFLACIÓN para ahorrar pesos.',
-          'GUARDA/INVIERTE en BTC: déjalo pasar (+50).',
-          'Si cortas BTC: pierdes 1 vida completa.',
-          'Tip: activa “mensajes educativos” en ⚙ para aprender jugando.',
-        ].join('\n\n'),
+        title: t('learn_5_title'),
+        body: t('learn_5_body'),
       },
     ];
 
@@ -869,10 +848,9 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     const summary = [
-      `Ahorraste $${score} pesos`,
-      `cortando la inflación`,
-      ``,
-      `Bitcoin guardados: ${bitcoins}`,
+      t('gameover_saved')(score),
+      '',
+      `${t('gameover_btc_saved')}: ${bitcoins}`,
     ].join('\n');
 
     k.add([
@@ -885,7 +863,7 @@ function createScenes(k, preloadedAssets) {
 
     // Name input section
     k.add([
-      k.text('Guarda tu puntuación:', { size: 18 }),
+      k.text(t('gameover_save_prompt'), { size: 18 }),
       k.pos(240, 340),
       k.anchor('center'),
       k.color(255, 220, 140),
@@ -1021,7 +999,7 @@ function createScenes(k, preloadedAssets) {
     const saveName = () => {
       if (saved || playerName.length === 0) return;
       saved = true;
-      
+
       fetch('/api/leaderboard', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1224,15 +1202,15 @@ function createScenes(k, preloadedAssets) {
       osc.type = 'sine';
       osc.frequency.value = 180;
       osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.11);
-      
+
       const filter = ctx.createBiquadFilter();
       filter.type = 'lowpass';
       filter.frequency.value = 400;
       filter.Q.value = 1;
-      
+
       osc.connect(filter);
       filter.connect(gain);
-      
+
       gain.gain.value = settings.sfxVolume * 0.4;
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.11);
       osc.start();
@@ -1300,7 +1278,7 @@ function createScenes(k, preloadedAssets) {
 
     const listY = 180;
     k.add([
-      k.text('Cargando...', { size: 20 }),
+      k.text(t('leaderboard_loading'), { size: 20 }),
       k.pos(240, listY),
       k.anchor('center'),
       k.color(240, 245, 255),
@@ -1312,10 +1290,10 @@ function createScenes(k, preloadedAssets) {
       .then(res => res.json())
       .then(rows => {
         k.get('*').forEach(o => {
-          if (o.text === 'Cargando...') k.destroy(o);
+          if (o.text === t('leaderboard_loading')) k.destroy(o);
         });
 
-        const lines = rows.slice(0, 10).map((r, i) => 
+        const lines = rows.slice(0, 10).map((r, i) =>
           `${i+1}. ${r.name}: ${r.score} pts (${r.bitcoins} BTC)`
         ).join('\n');
 
@@ -2188,7 +2166,7 @@ function createScenes(k, preloadedAssets) {
           // Pointy slash: small rotated rectangles
           const angle = Math.atan2(dy, dx) * 180 / Math.PI;
           const steps = Math.ceil(len / 6);
-          
+
           for (let i = 0; i <= steps; i++) {
             const t = i / steps;
             const ix = ax + dx * t;
