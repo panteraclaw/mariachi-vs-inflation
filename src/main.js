@@ -128,7 +128,7 @@ function createScenes(k, preloadedAssets) {
 
       k.add([
         k.sprite('mariachi'),
-        k.pos(240, 650), // lower, almost above the button
+        k.pos(240, 610), // lifted so feet don't overlap the JUGAR button
         k.anchor('center'),
         k.scale(mariachiScale),
         k.z(3),
