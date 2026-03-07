@@ -71,5 +71,5 @@ vercel --prod
 
 ---
 
-Built from Mexico with 🩵 by [@valentecreativo](https://valentinmartinez-linktree.netlify.app/)  
-Repo: https://github.com/panteraclaw/mariachi-vs-inflation
+Built from Mexico with 🩵 by [@valentecreativo](https://github.com/valentecreativo) con assistance de [Panteraclaw](https://github.com/panteraclaw)  
+🔗 https://valentinmartinez-linktree.netlify.app/
