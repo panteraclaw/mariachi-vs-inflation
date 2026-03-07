@@ -287,6 +287,7 @@ function createScenes(k, preloadedAssets) {
       ]);
     }
 
+    // Backdrop
     k.add([
       k.rect(460, 820, { radius: 18 }),
       k.pos(240, 427),
@@ -304,98 +305,141 @@ function createScenes(k, preloadedAssets) {
       k.z(2),
     ]);
 
-    // 3-step, image-based tutorial
-    const card = (y, title, lines, spriteKeys) => {
-      k.add([
-        k.rect(420, 190, { radius: 16 }),
-        k.pos(240, y),
+    let page = 0;
+    const pageObjs = [];
+
+    function clearPage() {
+      while (pageObjs.length) {
+        const o = pageObjs.pop();
+        try { k.destroy(o); } catch {}
+      }
+    }
+
+    function addObj(o) {
+      pageObjs.push(o);
+      return o;
+    }
+
+    function card(title, lines, spriteKeys) {
+      addObj(k.add([
+        k.rect(420, 360, { radius: 16 }),
+        k.pos(240, 430),
         k.anchor('center'),
         k.color(20, 30, 44),
         k.opacity(0.75),
         k.z(2),
-      ]);
+      ]));
 
-      k.add([
+      addObj(k.add([
         k.text(title, { size: 22 }),
-        k.pos(240, y - 68),
+        k.pos(240, 260),
         k.anchor('center'),
         k.color(255, 255, 255),
         k.z(3),
-      ]);
+      ]));
 
-      const iconY = y - 22;
+      const iconY = 355;
       const startX = 240 - (spriteKeys.length - 1) * 55;
       spriteKeys.forEach((key, i) => {
-        k.add([
+        addObj(k.add([
           k.sprite(key),
           k.pos(startX + i * 110, iconY),
           k.anchor('center'),
-          k.scale(0.18),
+          k.scale(0.10),
           k.z(3),
-        ]);
+        ]));
       });
 
-      k.add([
-        k.text(lines.join('\n'), { size: 18, width: 380, lineSpacing: 8, align: 'center' }),
-        k.pos(240, y + 58),
+      addObj(k.add([
+        k.text(lines.join('\n'), { size: 20, width: 380, lineSpacing: 10, align: 'center' }),
+        k.pos(240, 520),
         k.anchor('center'),
         k.color(230, 240, 255),
         k.z(3),
+      ]));
+
+      addObj(k.add([
+        k.text(`${page + 1}/3`, { size: 18 }),
+        k.pos(240, 640),
+        k.anchor('center'),
+        k.color(255, 255, 255),
+        k.opacity(0.7),
+        k.z(3),
+      ]));
+    }
+
+    function render() {
+      clearPage();
+
+      if (page === 0) {
+        card('1) INFLACIÓN (CÓRTALA)', [
+          '+10 si la cortas',
+          '-15 y daño si se te escapa',
+        ], ['tortilla', 'gasolina', 'aguacate']);
+      }
+
+      if (page === 1) {
+        card('2) POWERUPS', [
+          '⚡ Doble puntos (3s)',
+          '🟧 Time freeze (4s)',
+        ], ['lightning', 'bloque']);
+      }
+
+      if (page === 2) {
+        card('3) BITCOIN & AHORRO', [
+          'BITCOIN: no lo cortes (+50 si pasa)',
+          'AHORRO: +100 y limpia inflación',
+        ], ['bitcoin', 'ahorro']);
+      }
+    }
+
+    // Nav buttons (smaller)
+    const btnStyle = (x, y, label, onClick) => {
+      k.add([
+        k.rect(160, 50, { radius: 16 }),
+        k.pos(x, y + 6),
+        k.anchor('center'),
+        k.color(0, 0, 0),
+        k.opacity(0.30),
+        k.z(9),
       ]);
+
+      const b = k.add([
+        k.rect(160, 50, { radius: 16 }),
+        k.pos(x, y),
+        k.anchor('center'),
+        k.color(255, 104, 60),
+        k.opacity(0.92),
+        k.outline(4, k.rgb(255, 220, 140)),
+        k.area(),
+        k.z(10),
+      ]);
+
+      k.add([
+        k.text(label, { size: 20 }),
+        k.pos(x, y),
+        k.anchor('center'),
+        k.color(255, 255, 255),
+        k.z(11),
+      ]);
+
+      b.onClick(onClick);
+      return b;
     };
 
-    card(260, '1) INFLACIÓN (CÓRTALA)', [
-      '+10 si la cortas',
-      '-15 y daño si se te escapa',
-    ], ['tortilla', 'gasolina', 'aguacate']);
+    btnStyle(130, 760, 'VOLVER', () => k.go('menu'));
+    btnStyle(350, 760, 'SIGUIENTE', () => {
+      page = (page + 1) % 3;
+      render();
+    });
 
-    card(470, '2) POWERUPS', [
-      '⚡ x2 puntos (3s)',
-      '🟧 slow-mo (4s)',
-    ], ['lightning', 'bloque']);
-
-    card(680, '3) BITCOIN & AHORRO', [
-      'BITCOIN: no lo cortes (+50 si pasa)',
-      'AHORRO: +100 y limpia inflación',
-    ], ['bitcoin', 'ahorro']);
-
-    // Styled back button (same vibe as JUGAR)
-    const backBtnY = 800;
-    k.add([
-      k.rect(240, 56, { radius: 16 }),
-      k.pos(240, backBtnY + 6),
-      k.anchor('center'),
-      k.color(0, 0, 0),
-      k.opacity(0.35),
-      k.z(9),
-    ]);
-
-    const backBtn = k.add([
-      k.rect(240, 56, { radius: 16 }),
-      k.pos(240, backBtnY),
-      k.anchor('center'),
-      k.color(255, 104, 60),
-      k.outline(4, k.rgb(255, 220, 140)),
-      k.area(),
-      k.z(10),
-    ]);
-
-    k.add([
-      k.text('VOLVER', { size: 24 }),
-      k.pos(240, backBtnY),
-      k.anchor('center'),
-      k.color(255, 255, 255),
-      k.z(11),
-    ]);
-
-    backBtn.onClick(() => k.go('menu'));
+    render();
   });
 
   // ===== GAME OVER SCENE =====
   k.scene('gameover', (data) => {
     const score = data?.score ?? 0;
     const bitcoins = data?.bitcoins ?? 0;
-    const years = data?.years ?? 0;
     const pesos = data?.pesos ?? 0;
 
     k.setGravity(0);
@@ -433,11 +477,9 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     const summary = [
-      `Sobreviviste ${years} años a la inflación`,
-      `Protegiste $${pesos} pesos`,
+      `Ahorraste $${pesos} pesos`,
       `Bitcoin guardados: ${bitcoins}`,
-      '',
-      `Score: ${score}`,
+      `Puntuación: ${score}`,
     ].join('\n');
 
     k.add([
@@ -449,8 +491,8 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     const makeBtn = (label, y, onClick, opts = {}) => {
-      const w = opts.w ?? 340;
-      const h = opts.h ?? 58;
+      const w = opts.w ?? 300;
+      const h = opts.h ?? 52;
       const radius = 16;
 
       // Shadow
@@ -484,7 +526,7 @@ function createScenes(k, preloadedAssets) {
       ]);
 
       k.add([
-        k.text(label, { size: 24 }),
+        k.text(label, { size: 22 }),
         k.pos(240, y),
         k.anchor('center'),
         k.color(255, 255, 255),
@@ -495,25 +537,29 @@ function createScenes(k, preloadedAssets) {
       return b;
     };
 
-    // Clean mobile layout: 2 primary + 3 secondary
-    makeBtn('TRY AGAIN', 520, () => k.go('game'));
+    // Mobile layout (requested order)
+    makeBtn('JUGAR OTRA VEZ', 520, () => k.go('game'));
 
-    makeBtn('COMPRA BITCOIN', 590, () => {
-      window.open('https://www.aureobitcoin.com/es', '_blank');
-    });
-
-    makeBtn('SHARE SCORE', 660, () => {
-      const text = encodeURIComponent(`Sobreviví ${years} años a la inflación y protegí $${pesos}. Score: ${score}. BTC guardados: ${bitcoins}.`);
+    makeBtn('COMPARTIR PUNTUACIÓN', 580, () => {
+      const gameUrl = 'https://mariachi-vs-inflation.vercel.app';
+      const text = encodeURIComponent(
+        `Ahorré $${pesos} pesos esquivando la inflación. Puntuación: ${score}. BTC guardados: ${bitcoins}. ¿Cuánto podrás ahorrar? ${gameUrl}`
+      );
       const url = `https://twitter.com/intent/tweet?text=${text}`;
       window.open(url, '_blank');
+    }, { w: 360 });
+
+    makeBtn('LEADERBOARD', 640, () => {
+      // TODO next iteration
     });
 
-    makeBtn('APRENDE INFLACIÓN', 730, () => {
+    makeBtn('APRENDE SOBRE INFLACIÓN', 700, () => {
       window.open('https://inflacionmexico.com', '_blank');
-    });
+    }, { w: 360 });
 
-    // Placeholder for next iteration
-    // makeBtn('LEADERBOARD', 800, () => {});
+    makeBtn('COMPRA BITCOIN', 760, () => {
+      window.open('https://www.aureobitcoin.com/es', '_blank');
+    });
 
     // Tap anywhere top-left to return
     const back = k.add([
@@ -567,6 +613,9 @@ function createScenes(k, preloadedAssets) {
     let swiping = false;
     let lastPos = null;
     let inflationCutsThisSwipe = 0;
+
+    // If you cut 3 BTC, you lose ("paper hands")
+    let bitcoinCuts = 0;
 
     // --- UI ---
     const scoreText = k.add([
@@ -651,12 +700,10 @@ function createScenes(k, preloadedAssets) {
     }
 
     function endGame() {
-      const years = (elapsed / 10).toFixed(1);
       const pesos = Math.max(0, score) * 10;
       k.go('gameover', {
         score,
         bitcoins: bitcoinCounter,
-        years,
         pesos,
       });
     }
@@ -665,8 +712,10 @@ function createScenes(k, preloadedAssets) {
       const x = k.rand(40, 440);
       const y = -60;
 
-      const speedBase = 220 * difficultyMult();
-      const speedVar = k.rand(-30, 70);
+      // Start easier, ramp up with time + difficulty
+      const warmup = Math.min(1, elapsed / 18);
+      const speedBase = (160 + 60 * warmup) * difficultyMult();
+      const speedVar = k.rand(-20, 50);
       const speed = speedBase + speedVar;
 
       const angVel = k.rand(-2.2, 2.2);
@@ -676,9 +725,10 @@ function createScenes(k, preloadedAssets) {
       // Assets were feeling too big on mobile; scale them down substantially.
       // (Previous: ~0.5. Now: ~0.18-0.22 depending on type)
       const scale = (() => {
-        if (sprite === 'bitcoin') return 0.18;
-        if (sprite === 'lightning' || sprite === 'bloque' || sprite === 'ahorro' || sprite === 'nodo') return 0.18;
-        return 0.22; // inflation objects
+        // Reduce ~65% from previous sizes
+        if (sprite === 'bitcoin') return 0.065;
+        if (sprite === 'lightning' || sprite === 'bloque' || sprite === 'ahorro' || sprite === 'nodo') return 0.065;
+        return 0.08; // inflation objects
       })();
 
       const obj = k.add([
@@ -779,9 +829,20 @@ function createScenes(k, preloadedAssets) {
 
       // Bitcoin cut (bad)
       if (obj.kind === 'bitcoin') {
+        // Cutting BTC is bad: costs points + health; 3 cuts = instant death
         addScore(-30);
         bitcoinStreak = 0;
-        toast.show('Vendiste tu Bitcoin!', k.rgb(255, 180, 120));
+        bitcoinCuts += 1;
+        damageHeart();
+
+        if (bitcoinCuts >= 3) {
+          toast.show('PAPER HANDS! ☠', k.rgb(255, 180, 120));
+          endGame();
+          k.destroy(obj);
+          return;
+        }
+
+        toast.show('Vendiste tu Bitcoin! (-vida)', k.rgb(255, 180, 120));
         k.destroy(obj);
         return;
       }
@@ -790,7 +851,7 @@ function createScenes(k, preloadedAssets) {
       if (obj.kind === 'lightning') {
         scoreMultiplier = 2;
         multiplierUntil = elapsed + 3;
-        toast.show('x2 PUNTOS!', k.rgb(255, 255, 180));
+        toast.show('DOBLE PUNTOS x2 (3s)', k.rgb(255, 255, 180));
         k.destroy(obj);
         return;
       }
@@ -798,7 +859,7 @@ function createScenes(k, preloadedAssets) {
       if (obj.kind === 'bloque') {
         slowMotion = true;
         slowUntil = elapsed + 4;
-        toast.show('SLOW-MO', k.rgb(200, 220, 255));
+        toast.show('TIME FREEZE (4s)', k.rgb(200, 220, 255));
         k.destroy(obj);
         return;
       }
@@ -806,7 +867,7 @@ function createScenes(k, preloadedAssets) {
       if (obj.kind === 'ahorro') {
         addScore(100);
         explodeAhorro();
-        toast.show('AHORRO!', k.rgb(140, 255, 190));
+        toast.show('AHORRO: LIMPIEZA +100', k.rgb(140, 255, 190));
         k.destroy(obj);
         return;
       }
@@ -815,7 +876,7 @@ function createScenes(k, preloadedAssets) {
         // Super rare: grants +1 heart (up to 3) and resets current heart damage
         hearts = Math.min(3, hearts + 1);
         heartDamage = 0;
-        toast.show('VIDA EXTRA!', k.rgb(170, 220, 255));
+        toast.show('VIDA EXTRA +1', k.rgb(170, 220, 255));
         refreshUI();
         k.destroy(obj);
         return;
@@ -873,6 +934,18 @@ function createScenes(k, preloadedAssets) {
     k.onMouseMove(() => {
       if (!swiping) return;
       const p = k.mousePos();
+
+      // Visible slice trail (black)
+      k.add([
+        k.circle(6),
+        k.pos(p.x, p.y),
+        k.anchor('center'),
+        k.color(0, 0, 0),
+        k.opacity(0.55),
+        k.z(150),
+        k.lifespan(0.12, { fade: 0.06 }),
+      ]);
+
       if (lastPos) trySliceBetween(lastPos, p);
       lastPos = p;
     });
@@ -890,8 +963,9 @@ function createScenes(k, preloadedAssets) {
 
       spawnTimer += dt;
 
-      // Base spawn interval, gets faster with difficulty
-      const baseInterval = 0.75 / difficultyMult();
+      // Base spawn interval: start slower (less overwhelming), then ramp up
+      const warmup = Math.min(1, elapsed / 20);
+      const baseInterval = (1.10 - 0.40 * warmup) / difficultyMult();
 
       while (spawnTimer > baseInterval) {
         spawnTimer -= baseInterval;
