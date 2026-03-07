@@ -247,24 +247,24 @@ function createScenes(k, preloadedAssets) {
     helpBtn.onHover(() => k.setCursor('pointer'));
     helpBtn.onHoverEnd(() => k.setCursor('default'));
 
-    // "Aprende BTC" small, discreet link
+    // "Aprende BTC" (small, orange)
     const learnBtn = k.add([
-      k.rect(170, 38, { radius: 12 }),
-      k.pos(105, 830),
+      k.rect(140, 34, { radius: 12 }),
+      k.pos(95, 830),
       k.anchor('center'),
-      k.color(40, 40, 50),
-      k.opacity(0.55),
-      k.outline(2, k.rgb(120, 120, 140)),
+      k.color(255, 104, 60),
+      k.opacity(0.85),
+      k.outline(3, k.rgb(255, 220, 140)),
       k.area(),
       k.z(10),
     ]);
 
     k.add([
-      k.text('Aprende BTC', { size: 16 }),
-      k.pos(105, 830),
+      k.text('Aprende BTC', { size: 14 }),
+      k.pos(95, 830),
       k.anchor('center'),
-      k.color(210, 210, 230),
-      k.opacity(0.9),
+      k.color(255, 255, 255),
+      k.opacity(0.95),
       k.z(11),
     ]);
 
@@ -817,12 +817,18 @@ function createScenes(k, preloadedAssets) {
     let playerName = '';
     let saved = false;
 
+    // --- Mobile-friendly name input (DOM) ---
+    // Remove any previous leftover input
+    const prev = document.getElementById('oc-name-input');
+    if (prev) prev.remove();
+
     const nameBox = k.add([
       k.rect(280, 42, { radius: 12 }),
       k.pos(200, 380),
       k.anchor('center'),
       k.color(40, 50, 70),
       k.outline(2, k.rgb(150, 160, 180)),
+      k.area(),
       k.z(2),
     ]);
 
@@ -835,31 +841,86 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     const placeholderText = k.add([
-      k.text('Escribe tu nombre...', { size: 18 }),
+      k.text('Toca para escribir...', { size: 18 }),
       k.pos(200, 380),
       k.anchor('center'),
       k.color(120, 130, 150),
-      k.opacity(0.6),
+      k.opacity(0.7),
       k.z(3),
     ]);
 
-    k.onCharInput((ch) => {
+    // Small hint on web
+    const typeHint = k.add([
+      k.text('⌨ Escribe tu nombre', { size: 14 }),
+      k.pos(200, 412),
+      k.anchor('center'),
+      k.color(255, 220, 140),
+      k.opacity(0.0),
+      k.z(3),
+    ]);
+
+    const domInput = document.createElement('input');
+    domInput.id = 'oc-name-input';
+    domInput.type = 'text';
+    domInput.maxLength = 20;
+    domInput.autocapitalize = 'words';
+    domInput.autocomplete = 'name';
+    domInput.placeholder = 'Tu nombre';
+
+    // Invisible but focusable, positioned over the canvas
+    domInput.style.position = 'fixed';
+    domInput.style.left = '50%';
+    domInput.style.top = '50%';
+    domInput.style.transform = 'translate(-50%, -50%)';
+    domInput.style.width = '1px';
+    domInput.style.height = '1px';
+    domInput.style.opacity = '0';
+    domInput.style.zIndex = '9999';
+    domInput.style.border = '0';
+    domInput.style.background = 'transparent';
+    domInput.style.color = 'transparent';
+    domInput.style.caretColor = 'transparent';
+
+    document.body.appendChild(domInput);
+
+    const syncName = () => {
+      playerName = domInput.value.slice(0, 20);
+      nameDisplay.text = playerName;
+      placeholderText.opacity = playerName.length ? 0 : 0.7;
+    };
+
+    domInput.addEventListener('input', () => {
       if (saved) return;
-      if (playerName.length < 20) {
-        playerName += ch;
-        nameDisplay.text = playerName;
-        placeholderText.opacity = 0;
-      }
+      syncName();
     });
 
-    k.onKeyPress('backspace', () => {
+    domInput.addEventListener('focus', () => {
       if (saved) return;
-      playerName = playerName.slice(0, -1);
-      nameDisplay.text = playerName;
-      if (playerName.length === 0) {
-        placeholderText.opacity = 0.6;
-      }
+      typeHint.opacity = 0.85;
     });
+
+    domInput.addEventListener('blur', () => {
+      typeHint.opacity = 0;
+    });
+
+    const focusInput = () => {
+      if (saved) return;
+      domInput.focus();
+      // iOS sometimes needs a tick
+      setTimeout(() => domInput.focus(), 20);
+    };
+
+    nameBox.onClick(focusInput);
+    nameBox.onHover(() => k.setCursor('text'));
+    nameBox.onHoverEnd(() => k.setCursor('default'));
+
+    // Try to focus once (helps desktop discoverability)
+    setTimeout(() => {
+      // Don't steal focus aggressively on mobile; just show hint on desktop
+      if (!('ontouchstart' in window)) {
+        typeHint.opacity = 0.65;
+      }
+    }, 300);
 
     // Save button (floppy disk icon) - positioned to the right of input
     const saveBtn = k.add([
@@ -891,6 +952,8 @@ function createScenes(k, preloadedAssets) {
         .then(() => {
           nameDisplay.text = '✓ Guardado!';
           nameDisplay.color = k.rgb(120, 220, 160);
+          const inp = document.getElementById('oc-name-input');
+          if (inp) inp.blur();
         })
         .catch(() => {
           nameDisplay.text = 'Error';
@@ -1818,6 +1881,36 @@ function createScenes(k, preloadedAssets) {
       }
     }
 
+    function btcFX(x) {
+      // Positive effect when you "save/invest" in BTC by letting it pass
+      const baseY = 854;
+      const burst = 5;
+
+      for (let i = 0; i < burst; i++) {
+        const w = k.rand(8, 16);
+        const h = k.rand(35, 80);
+        const dx = k.rand(-20, 20);
+        const c = Math.random() < 0.5 ? k.rgb(90, 220, 140) : k.rgb(120, 255, 190);
+
+        const p = k.add([
+          k.rect(w, h, { radius: 4 }),
+          k.pos(x + dx, baseY + 20),
+          k.anchor('center'),
+          k.color(c),
+          k.opacity(0.22),
+          k.z(140),
+          { vy: k.rand(-200, -130), t: 0 },
+        ]);
+
+        p.onUpdate(() => {
+          p.t += k.dt();
+          p.pos.y += p.vy * k.dt();
+          p.opacity = Math.max(0, 0.22 - p.t * 0.30);
+          if (p.t > 0.8) k.destroy(p);
+        });
+      }
+    }
+
     function handleMiss(obj) {
       // Inflation misses are punished
       if (INFLATION_SPRITES.includes(obj.kind)) {
@@ -1827,11 +1920,12 @@ function createScenes(k, preloadedAssets) {
         return;
       }
 
-      // Bitcoin: reward for NOT cutting
+      // Bitcoin: reward for saving/investing (NOT cutting)
       if (obj.kind === 'bitcoin') {
         addScore(50);
         bitcoinCounter += 1;
         bitcoinStreak += 1;
+        btcFX(obj.pos.x);
 
         if (bitcoinStreak === 3) {
           addScore(100);
