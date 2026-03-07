@@ -951,11 +951,20 @@ function createScenes(k, preloadedAssets) {
       if (!swiping) return;
       swiping = false;
 
-      // Combo bonus
+      // Combo bonus + feedback
       const c = inflationCutsThisSwipe;
-      if (c === 2) addScore(20);
-      else if (c === 3) addScore(40);
-      else if (c >= 4) addScore(80);
+      if (c === 2) {
+        addScore(20);
+        toast.show('COMBO x2 +20', k.rgb(255, 255, 255));
+      }
+      else if (c === 3) {
+        addScore(40);
+        toast.show('COMBO x3 +40', k.rgb(255, 255, 255));
+      }
+      else if (c >= 4) {
+        addScore(80);
+        toast.show('COMBO x4 +80', k.rgb(255, 255, 255));
+      }
 
       inflationCutsThisSwipe = 0;
       lastPos = null;
@@ -965,18 +974,35 @@ function createScenes(k, preloadedAssets) {
       if (!swiping) return;
       const p = k.mousePos();
 
-      // Visible slice trail (black)
-      k.add([
-        k.circle(6),
-        k.pos(p.x, p.y),
-        k.anchor('center'),
-        k.color(0, 0, 0),
-        k.opacity(0.55),
-        k.z(150),
-        k.lifespan(0.12, { fade: 0.06 }),
-      ]);
+      if (lastPos) {
+        // Visible slice trail: a short black slash segment between points
+        const ax = lastPos.x, ay = lastPos.y;
+        const bx = p.x, by = p.y;
+        const dx = bx - ax;
+        const dy = by - ay;
+        const len = Math.sqrt(dx * dx + dy * dy);
 
-      if (lastPos) trySliceBetween(lastPos, p);
+        if (len > 2) {
+          const mx = (ax + bx) / 2;
+          const my = (ay + by) / 2;
+          const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+          const thickness = 10;
+
+          k.add([
+            k.rect(len, thickness, { radius: thickness / 2 }),
+            k.pos(mx, my),
+            k.anchor('center'),
+            k.rotate(ang),
+            k.color(0, 0, 0),
+            k.opacity(0.35),
+            k.z(150),
+            k.lifespan(0.10, { fade: 0.06 }),
+          ]);
+        }
+
+        trySliceBetween(lastPos, p);
+      }
+
       lastPos = p;
     });
 
