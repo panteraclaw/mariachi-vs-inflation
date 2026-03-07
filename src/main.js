@@ -86,6 +86,7 @@ function initGame(preloadedAssets) {
   k.loadSprite('lightning', '/assets/PowerUps/Lightning.png');
   k.loadSprite('bloque', '/assets/PowerUps/Bloque.png');
   k.loadSprite('ahorro', '/assets/PowerUps/Ahorro.png');
+  k.loadSprite('nodo', '/assets/PowerUps/Nodo.png');
 
   k.onLoad(() => {
     createScenes(k, preloadedAssets);
@@ -181,15 +182,25 @@ function createScenes(k, preloadedAssets) {
       k.z(11),
     ]);
 
-    // "Aprende a jugar" secondary button
+    // "Aprende a jugar" secondary button (same style family as JUGAR)
     const helpBtnY = 690;
+
+    k.add([
+      k.rect(240, 52, { radius: 16 }),
+      k.pos(240, helpBtnY + 6),
+      k.anchor('center'),
+      k.color(0, 0, 0),
+      k.opacity(0.28),
+      k.z(8),
+    ]);
+
     const helpBtn = k.add([
-      k.rect(240, 48, { radius: 14 }),
+      k.rect(240, 52, { radius: 16 }),
       k.pos(240, helpBtnY),
       k.anchor('center'),
-      k.color(70, 110, 160),
-      k.opacity(0.9),
-      k.outline(3, k.rgb(170, 200, 255)),
+      k.color(255, 104, 60),
+      k.opacity(0.92),
+      k.outline(4, k.rgb(255, 220, 140)),
       k.area(),
       k.z(10),
     ]);
@@ -293,47 +304,88 @@ function createScenes(k, preloadedAssets) {
       k.z(2),
     ]);
 
-    const tutorialText = [
-      'Corta objetos de INFLACIÓN para ganar puntos (+10).',
-      'Si se te escapan: -15 y daño al corazón.',
-      '',
-      'BITCOIN: NO lo cortes.',
-      'Si lo dejas pasar: +50 y cuenta de BTC.',
-      'Si lo cortas: -30 ("Vendiste tu Bitcoin!").',
-      '',
-      'POWERUPS:',
-      '⚡ Lightning: x2 puntos por 3s',
-      '🟧 Bloque: cámara lenta por 4s',
-      '🌱 Ahorro: +100 y limpia inflación en pantalla',
-      '',
-      'COMBOS (en un solo swipe): x2 +20 | x3 +40 | x4 +80',
-      'BTC STREAK: x3 +100 | x5 +200 (HODL!)',
-    ].join('\n');
+    // 3-step, image-based tutorial
+    const card = (y, title, lines, spriteKeys) => {
+      k.add([
+        k.rect(420, 190, { radius: 16 }),
+        k.pos(240, y),
+        k.anchor('center'),
+        k.color(20, 30, 44),
+        k.opacity(0.75),
+        k.z(2),
+      ]);
 
+      k.add([
+        k.text(title, { size: 22 }),
+        k.pos(240, y - 68),
+        k.anchor('center'),
+        k.color(255, 255, 255),
+        k.z(3),
+      ]);
+
+      const iconY = y - 22;
+      const startX = 240 - (spriteKeys.length - 1) * 55;
+      spriteKeys.forEach((key, i) => {
+        k.add([
+          k.sprite(key),
+          k.pos(startX + i * 110, iconY),
+          k.anchor('center'),
+          k.scale(0.18),
+          k.z(3),
+        ]);
+      });
+
+      k.add([
+        k.text(lines.join('\n'), { size: 18, width: 380, lineSpacing: 8, align: 'center' }),
+        k.pos(240, y + 58),
+        k.anchor('center'),
+        k.color(230, 240, 255),
+        k.z(3),
+      ]);
+    };
+
+    card(260, '1) INFLACIÓN (CÓRTALA)', [
+      '+10 si la cortas',
+      '-15 y daño si se te escapa',
+    ], ['tortilla', 'gasolina', 'aguacate']);
+
+    card(470, '2) POWERUPS', [
+      '⚡ x2 puntos (3s)',
+      '🟧 slow-mo (4s)',
+    ], ['lightning', 'bloque']);
+
+    card(680, '3) BITCOIN & AHORRO', [
+      'BITCOIN: no lo cortes (+50 si pasa)',
+      'AHORRO: +100 y limpia inflación',
+    ], ['bitcoin', 'ahorro']);
+
+    // Styled back button (same vibe as JUGAR)
+    const backBtnY = 800;
     k.add([
-      k.text(tutorialText, { size: 18, width: 420, lineSpacing: 10 }),
-      k.pos(240, 420),
+      k.rect(240, 56, { radius: 16 }),
+      k.pos(240, backBtnY + 6),
       k.anchor('center'),
-      k.color(230, 240, 255),
-      k.z(2),
+      k.color(0, 0, 0),
+      k.opacity(0.35),
+      k.z(9),
     ]);
 
     const backBtn = k.add([
-      k.rect(220, 58, { radius: 14 }),
-      k.pos(240, 780),
+      k.rect(240, 56, { radius: 16 }),
+      k.pos(240, backBtnY),
       k.anchor('center'),
-      k.color(90, 110, 140),
-      k.outline(3, k.rgb(170, 190, 230)),
+      k.color(255, 104, 60),
+      k.outline(4, k.rgb(255, 220, 140)),
       k.area(),
-      k.z(3),
+      k.z(10),
     ]);
 
     k.add([
-      k.text('VOLVER', { size: 26 }),
-      k.pos(240, 780),
+      k.text('VOLVER', { size: 24 }),
+      k.pos(240, backBtnY),
       k.anchor('center'),
       k.color(255, 255, 255),
-      k.z(4),
+      k.z(11),
     ]);
 
     backBtn.onClick(() => k.go('menu'));
@@ -396,42 +448,72 @@ function createScenes(k, preloadedAssets) {
       k.z(2),
     ]);
 
-    const makeBtn = (label, y, color, onClick) => {
+    const makeBtn = (label, y, onClick, opts = {}) => {
+      const w = opts.w ?? 340;
+      const h = opts.h ?? 58;
+      const radius = 16;
+
+      // Shadow
+      k.add([
+        k.rect(w, h, { radius }),
+        k.pos(240, y + 6),
+        k.anchor('center'),
+        k.color(0, 0, 0),
+        k.opacity(0.32),
+        k.z(8),
+      ]);
+
       const b = k.add([
-        k.rect(320, 62, { radius: 16 }),
+        k.rect(w, h, { radius }),
         k.pos(240, y),
         k.anchor('center'),
-        k.color(...color),
-        k.outline(3, k.rgb(255, 220, 140)),
+        k.color(255, 104, 60),
+        k.outline(4, k.rgb(255, 220, 140)),
         k.area(),
-        k.z(3),
+        k.z(10),
       ]);
+
+      // Highlight
       k.add([
-        k.text(label, { size: 26 }),
+        k.rect(w - 18, 16, { radius: 10 }),
+        k.pos(240, y - 16),
+        k.anchor('center'),
+        k.color(255, 255, 255),
+        k.opacity(0.16),
+        k.z(11),
+      ]);
+
+      k.add([
+        k.text(label, { size: 24 }),
         k.pos(240, y),
         k.anchor('center'),
         k.color(255, 255, 255),
-        k.z(4),
+        k.z(12),
       ]);
+
       b.onClick(onClick);
       return b;
     };
 
-    makeBtn('TRY AGAIN', 520, [255, 104, 60], () => k.go('game'));
+    // Clean mobile layout: 2 primary + 3 secondary
+    makeBtn('TRY AGAIN', 520, () => k.go('game'));
 
-    makeBtn('SHARE SCORE', 590, [90, 140, 220], () => {
+    makeBtn('COMPRA BITCOIN', 590, () => {
+      window.open('https://www.aureobitcoin.com/es', '_blank');
+    });
+
+    makeBtn('SHARE SCORE', 660, () => {
       const text = encodeURIComponent(`Sobreviví ${years} años a la inflación y protegí $${pesos}. Score: ${score}. BTC guardados: ${bitcoins}.`);
       const url = `https://twitter.com/intent/tweet?text=${text}`;
       window.open(url, '_blank');
     });
 
-    makeBtn('APRENDE INFLACIÓN', 660, [70, 170, 140], () => {
+    makeBtn('APRENDE INFLACIÓN', 730, () => {
       window.open('https://inflacionmexico.com', '_blank');
     });
 
-    makeBtn('LEADERBOARD', 730, [120, 120, 130], () => {
-      // Placeholder for next iteration
-    });
+    // Placeholder for next iteration
+    // makeBtn('LEADERBOARD', 800, () => {});
 
     // Tap anywhere top-left to return
     const back = k.add([
@@ -546,7 +628,7 @@ function createScenes(k, preloadedAssets) {
 
     // --- Helpers ---
     const INFLATION_SPRITES = ['tortilla', 'gasolina', 'renta', 'aguacate', 'canasta'];
-    const POWERUP_SPRITES = ['lightning', 'bloque', 'ahorro'];
+    const POWERUP_SPRITES = ['lightning', 'bloque', 'ahorro', 'nodo'];
 
     function difficultyMult() {
       const stage = Math.floor(elapsed / 20);
@@ -590,7 +672,14 @@ function createScenes(k, preloadedAssets) {
       const angVel = k.rand(-2.2, 2.2);
 
       const sprite = kind;
-      const scale = kind === 'bitcoin' ? 0.42 : 0.5;
+
+      // Assets were feeling too big on mobile; scale them down substantially.
+      // (Previous: ~0.5. Now: ~0.18-0.22 depending on type)
+      const scale = (() => {
+        if (sprite === 'bitcoin') return 0.18;
+        if (sprite === 'lightning' || sprite === 'bloque' || sprite === 'ahorro' || sprite === 'nodo') return 0.18;
+        return 0.22; // inflation objects
+      })();
 
       const obj = k.add([
         k.sprite(sprite),
@@ -721,6 +810,16 @@ function createScenes(k, preloadedAssets) {
         k.destroy(obj);
         return;
       }
+
+      if (obj.kind === 'nodo') {
+        // Super rare: grants +1 heart (up to 3) and resets current heart damage
+        hearts = Math.min(3, hearts + 1);
+        heartDamage = 0;
+        toast.show('VIDA EXTRA!', k.rgb(170, 220, 255));
+        refreshUI();
+        k.destroy(obj);
+        return;
+      }
     }
 
     function distPointToSegment(px, py, ax, ay, bx, by) {
@@ -800,22 +899,34 @@ function createScenes(k, preloadedAssets) {
         // Weighted spawn
         const r = Math.random();
 
-        // ~70% inflation
-        if (r < 0.70) {
+        // Mostly inflation
+        if (r < 0.80) {
           const kind = INFLATION_SPRITES[Math.floor(Math.random() * INFLATION_SPRITES.length)];
           spawnObject(kind);
           continue;
         }
 
-        // ~15% bitcoin
-        if (r < 0.85) {
+        // Bitcoin (common-ish)
+        if (r < 0.94) {
           spawnObject('bitcoin');
           continue;
         }
 
-        // ~15% powerups
-        const p = POWERUP_SPRITES[Math.floor(Math.random() * POWERUP_SPRITES.length)];
-        spawnObject(p);
+        // Powerups should be rarer
+        // 0.94 - 0.985 => common powerups (lightning/bloque)
+        if (r < 0.985) {
+          spawnObject(Math.random() < 0.5 ? 'lightning' : 'bloque');
+          continue;
+        }
+
+        // 0.985 - 0.995 => ahorro (rare)
+        if (r < 0.995) {
+          spawnObject('ahorro');
+          continue;
+        }
+
+        // 0.995 - 1.0 => nodo (super super rare)
+        spawnObject('nodo');
       }
     });
 
