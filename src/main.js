@@ -133,14 +133,40 @@ function createScenes(k, preloadedAssets) {
     const btnH = 70;
     const btnTopY = btnY - btnH / 2;
 
+    // Button styling: shadow + outline + highlight
+    const btnW = 260;
+    const btnRadius = 16;
+
+    // Shadow
+    k.add([
+      k.rect(btnW, btnH, { radius: btnRadius }),
+      k.pos(240, btnY + 6),
+      k.anchor('center'),
+      k.color(0, 0, 0),
+      k.opacity(0.35),
+      k.z(9),
+    ]);
+
+    // Main button
     const btn = k.add([
-      k.rect(240, btnH, { radius: 12 }),
+      k.rect(btnW, btnH, { radius: btnRadius }),
       k.pos(240, btnY),
       k.anchor('center'),
-      k.color(255, 100, 50),
+      k.color(255, 104, 60),
+      k.outline(4, k.rgb(255, 220, 140)),
       k.area(),
       k.z(10),
       'btn',
+    ]);
+
+    // Highlight strip
+    k.add([
+      k.rect(btnW - 18, 18, { radius: 10 }),
+      k.pos(240, btnY - 18),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.opacity(0.18),
+      k.z(11),
     ]);
 
     // Mariachi - make him the PROTAGONIST and align him precisely above the button
@@ -151,8 +177,9 @@ function createScenes(k, preloadedAssets) {
         480 / mariachiData.height          // cap height around 480px
       );
 
-      // We want the bottom edge of the sprite to be 2px above the button top
-      const desiredBottomY = btnTopY - 2;
+      // We want the bottom edge to sit very close to the button.
+      // (Slight overlap looks nicer because the mariachi has a "floor" at the bottom.)
+      const desiredBottomY = btnTopY + 4;
       const mariachiHeightPx = mariachiData.height * mariachiScale;
       const mariachiY = desiredBottomY - mariachiHeightPx / 2;
 
@@ -165,21 +192,31 @@ function createScenes(k, preloadedAssets) {
       ]);
     }
 
+    // Text with subtle shadow
     k.add([
-      k.text('JUGAR', { size: 32 }),
-      k.pos(240, 770),
+      k.text('JUGAR', { size: 34 }),
+      k.pos(242, btnY + 2),
+      k.anchor('center'),
+      k.color(0, 0, 0),
+      k.opacity(0.25),
+      k.z(12),
+    ]);
+
+    k.add([
+      k.text('JUGAR', { size: 34 }),
+      k.pos(240, btnY),
       k.anchor('center'),
       k.color(255, 255, 255),
-      k.z(10),
+      k.z(13),
     ]);
 
     btn.onClick(() => k.go('game'));
     btn.onHover(() => {
-      btn.color = k.rgb(255, 120, 70);
+      btn.color = k.rgb(255, 130, 85);
       k.setCursor('pointer');
     });
     btn.onHoverEnd(() => {
-      btn.color = k.rgb(255, 100, 50);
+      btn.color = k.rgb(255, 104, 60);
       k.setCursor('default');
     });
   });
