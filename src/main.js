@@ -104,8 +104,8 @@ function createScenes(k, preloadedAssets) {
 
     // Logo - top center
     if (logoData) {
-      // Scale logo to 70% of screen width
-      const logoScale = (480 * 0.7) / logoData.width;
+      // Scale logo a bit bigger (80% of screen width)
+      const logoScale = (480 * 0.8) / logoData.width;
       
       k.add([
         k.sprite('logo'),
