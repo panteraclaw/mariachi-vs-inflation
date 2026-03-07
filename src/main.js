@@ -1,18 +1,16 @@
 import kaplay from 'kaplay';
 
 // Assets to preload
-const ASSETS_TO_LOAD = [
-  '/assets/menu-banner.jpg'
-];
+const ASSETS_TO_LOAD = ['/assets/menu-banner.jpg'];
 
-// Preload images with native JavaScript (guarantees they load)
+// Preload images with native JavaScript
 function preloadImages(urls) {
   return Promise.all(
     urls.map(url => {
       return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => {
-          console.log(`✓ Asset loaded: ${url}`);
+          console.log(`✓ Asset loaded: ${url} (${img.width}x${img.height})`);
           resolve({ url, width: img.width, height: img.height });
         };
         img.onerror = () => {
@@ -25,53 +23,61 @@ function preloadImages(urls) {
   );
 }
 
-// Update loading text
+// Loading screen
 const loadingText = document.getElementById('loading-text');
 loadingText.textContent = 'Precargando imágenes...';
 
-// Preload ALL assets BEFORE initializing game
+// Preload THEN initialize
 preloadImages(ASSETS_TO_LOAD)
   .then((loadedAssets) => {
-    console.log('✓ All assets preloaded successfully:', loadedAssets);
+    console.log('✓ All assets preloaded:', loadedAssets);
     loadingText.textContent = '¡Listo! Iniciando juego...';
     
-    // Wait 500ms to ensure images are in cache
+    // Wait for assets to be fully in cache
     setTimeout(() => {
       document.getElementById('loading-screen').remove();
-      initGame();
-    }, 500);
+      initGame(loadedAssets);
+    }, 300);
   })
   .catch((err) => {
-    console.error('Error preloading assets:', err);
+    console.error('❌ Error preloading assets:', err);
     loadingText.textContent = 'Error cargando assets. Refresca la página.';
     loadingText.style.color = '#ff6432';
   });
 
-function initGame() {
-  // Initialize KAPLAY
+function initGame(preloadedAssets) {
+  console.log('🎮 Initializing game...');
+  
   const k = kaplay({
     width: 480,
     height: 854,
     background: [15, 40, 60],
-    scale: Math.min(
-      window.innerWidth / 480,
-      window.innerHeight / 854
-    ),
+    scale: Math.min(window.innerWidth / 480, window.innerHeight / 854),
     letterbox: true,
     crisp: true,
     touchToMouse: true,
     debug: false,
   });
 
-  // Show canvas
   k.canvas.classList.add('loaded');
 
-  // Load sprites (images are already in browser cache)
+  // Load sprites (already in cache)
   k.loadSprite('menu-banner', '/assets/menu-banner.jpg');
+  
+  // Wait a tiny bit for KAPLAY to register sprites
+  setTimeout(() => {
+    console.log('🎨 Creating scenes...');
+    createScenes(k);
+    k.go('menu');
+    console.log('✓ Game started');
+  }, 100);
+}
 
-  // MENU SCENE
+function createScenes(k) {
+  // ===== MENU SCENE =====
   k.scene('menu', () => {
     k.setGravity(0);
+    console.log('📋 Menu scene loaded');
 
     // Background fallback
     k.add([
@@ -81,20 +87,27 @@ function initGame() {
       k.z(-1),
     ]);
 
-    // Menu banner (full screen)
-    const banner = k.add([
-      k.sprite('menu-banner'),
-      k.pos(240, 427),
-      k.anchor('center'),
-      k.z(0),
-    ]);
+    // Try to load banner sprite
+    const spriteData = k.getSprite('menu-banner');
+    console.log('🖼️ Sprite data:', spriteData ? `${spriteData.width}x${spriteData.height}` : 'NOT FOUND');
 
-    // Scale to cover screen
-    const scaleX = 480 / banner.width;
-    const scaleY = 854 / banner.height;
-    banner.scale = Math.max(scaleX, scaleY);
+    if (spriteData && spriteData.width > 0) {
+      const scaleX = 480 / spriteData.width;
+      const scaleY = 854 / spriteData.height;
+      const scale = Math.max(scaleX, scaleY);
 
-    console.log('✓ Banner displayed:', banner.width, 'x', banner.height, 'scale:', banner.scale);
+      const banner = k.add([
+        k.sprite('menu-banner'),
+        k.pos(240, 427),
+        k.anchor('center'),
+        k.scale(scale),
+        k.z(0),
+      ]);
+      
+      console.log('✓ Banner displayed at scale:', scale);
+    } else {
+      console.warn('⚠️ Banner sprite not ready');
+    }
 
     // JUGAR button
     const btn = k.add([
@@ -115,11 +128,16 @@ function initGame() {
       k.z(10),
     ]);
 
-    btn.onClick(() => k.go('game'));
+    btn.onClick(() => {
+      console.log('🎮 Going to game scene');
+      k.go('game');
+    });
+    
     btn.onHover(() => {
       btn.color = k.rgb(255, 120, 70);
       k.setCursor('pointer');
     });
+    
     btn.onHoverEnd(() => {
       btn.color = k.rgb(255, 100, 50);
       k.setCursor('default');
@@ -128,9 +146,10 @@ function initGame() {
     k.onClick(() => k.go('game'));
   });
 
-  // GAME SCENE (placeholder for now)
+  // ===== GAME SCENE (placeholder) =====
   k.scene('game', () => {
     k.setGravity(400);
+    console.log('🎮 Game scene loaded');
 
     k.add([
       k.rect(480, 854),
@@ -139,15 +158,19 @@ function initGame() {
     ]);
 
     k.add([
-      k.text('GAMEPLAY\n(click para volver)', { size: 24, align: 'center' }),
+      k.text('GAMEPLAY AQUÍ\n\n(Click para volver al menú)', {
+        size: 24,
+        align: 'center',
+        width: 400,
+      }),
       k.pos(240, 427),
       k.anchor('center'),
       k.color(255, 255, 255),
     ]);
 
-    k.onClick(() => k.go('menu'));
+    k.onClick(() => {
+      console.log('🔙 Going back to menu');
+      k.go('menu');
+    });
   });
-
-  // Start game
-  k.go('menu');
 }
