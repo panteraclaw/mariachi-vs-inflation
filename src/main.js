@@ -322,9 +322,12 @@ function createScenes(k, preloadedAssets) {
       return o;
     }
 
-    function card(title, lines, spriteKeys) {
+    function card(title, lines, spriteData) {
+      // spriteData: array of {key, label} or just keys
+      const items = spriteData.map(s => typeof s === 'string' ? { key: s, label: '' } : s);
+
       addObj(k.add([
-        k.rect(420, 360, { radius: 16 }),
+        k.rect(420, 380, { radius: 16 }),
         k.pos(240, 430),
         k.anchor('center'),
         k.color(20, 30, 44),
@@ -340,21 +343,39 @@ function createScenes(k, preloadedAssets) {
         k.z(3),
       ]));
 
-      const iconY = 355;
-      const startX = 240 - (spriteKeys.length - 1) * 55;
-      spriteKeys.forEach((key, i) => {
+      // Icons in two rows if > 3
+      const perRow = items.length > 3 ? 3 : items.length;
+      const rows = Math.ceil(items.length / perRow);
+
+      items.forEach((item, i) => {
+        const row = Math.floor(i / perRow);
+        const col = i % perRow;
+        const startX = 240 - (perRow - 1) * 50;
+        const x = startX + col * 100;
+        const y = 340 + row * 90;
+
         addObj(k.add([
-          k.sprite(key),
-          k.pos(startX + i * 110, iconY),
+          k.sprite(item.key),
+          k.pos(x, y),
           k.anchor('center'),
-          k.scale(0.10),
+          k.scale(0.08),
           k.z(3),
         ]));
+
+        if (item.label) {
+          addObj(k.add([
+            k.text(item.label, { size: 13 }),
+            k.pos(x, y + 30),
+            k.anchor('center'),
+            k.color(200, 210, 230),
+            k.z(3),
+          ]));
+        }
       });
 
       addObj(k.add([
-        k.text(lines.join('\n'), { size: 20, width: 380, lineSpacing: 10, align: 'center' }),
-        k.pos(240, 520),
+        k.text(lines.join('\n'), { size: 16, width: 380, lineSpacing: 8, align: 'center' }),
+        k.pos(240, 340 + rows * 90 + 80),
         k.anchor('center'),
         k.color(230, 240, 255),
         k.z(3),
@@ -375,24 +396,35 @@ function createScenes(k, preloadedAssets) {
 
       if (page === 0) {
         card('1) INFLACIÓN (CÓRTALA)', [
-          'Tortillas • Renta • Gasolina',
-          'Canasta Básica • Aguacates',
           '+10 al cortar | -15 + daño si se escapa',
-        ], ['tortilla', 'renta', 'gasolina', 'canasta', 'aguacate']);
+        ], [
+          { key: 'tortilla', label: 'Tortillas' },
+          { key: 'renta', label: 'Renta' },
+          { key: 'gasolina', label: 'Gasolina' },
+          { key: 'canasta', label: 'Canasta' },
+          { key: 'aguacate', label: 'Aguacates' },
+        ]);
       }
 
       if (page === 1) {
         card('2) POWERUPS', [
-          '⚡ Doble puntos (3s)',
-          '🟧 Time freeze (4s)',
-        ], ['lightning', 'bloque']);
+          'Corta estos para activarlos',
+        ], [
+          { key: 'lightning', label: '⚡ x2 pts' },
+          { key: 'bloque', label: '🟧 Freeze' },
+          { key: 'ahorro', label: '🌱 Limpia' },
+          { key: 'nodo', label: '🔷 +Vida' },
+        ]);
       }
 
       if (page === 2) {
         card('3) BITCOIN & AHORRO', [
           'BITCOIN: no lo cortes (+50 si pasa)',
           'AHORRO: +100 y limpia inflación',
-        ], ['bitcoin', 'ahorro']);
+        ], [
+          { key: 'bitcoin', label: 'Bitcoin' },
+          { key: 'ahorro', label: 'Ahorro' },
+        ]);
       }
     }
 
@@ -481,8 +513,9 @@ function createScenes(k, preloadedAssets) {
 
     const summary = [
       `Ahorraste $${pesos} pesos`,
+      `cortando la inflación`,
+      ``,
       `Bitcoin guardados: ${bitcoins}`,
-      `Puntuación: ${score}`,
     ].join('\n');
 
     k.add([
@@ -537,6 +570,8 @@ function createScenes(k, preloadedAssets) {
       ]);
 
       b.onClick(onClick);
+      b.onHover(() => k.setCursor('pointer'));
+      b.onHoverEnd(() => k.setCursor('default'));
       return b;
     };
 
@@ -546,7 +581,7 @@ function createScenes(k, preloadedAssets) {
     makeBtn('COMPARTIR PUNTUACIÓN', 580, () => {
       const gameUrl = 'https://mariachi-vs-inflation.vercel.app';
       const text = encodeURIComponent(
-        `Ahorré $${pesos} pesos esquivando la inflación. Puntuación: ${score}. BTC guardados: ${bitcoins}. ¿Cuánto podrás ahorrar? ${gameUrl}`
+        `Ahorré $${pesos} pesos cortando la inflación. BTC guardados: ${bitcoins}. ¿Cuánto podrás ahorrar? ${gameUrl}`
       );
       const url = `https://twitter.com/intent/tweet?text=${text}`;
       window.open(url, '_blank');
@@ -566,7 +601,7 @@ function createScenes(k, preloadedAssets) {
 
     // Styled small "Menú" button
     const menuX = 70;
-    const menuY = 28;
+    const menuY = 60;
 
     k.add([
       k.rect(110, 36, { radius: 12 }),
@@ -668,28 +703,44 @@ function createScenes(k, preloadedAssets) {
       k.z(100),
     ]);
 
-    const toast = k.add([
+    // Toast with background for visibility
+    const toastBg = k.add([
+      k.rect(400, 50, { radius: 12 }),
+      k.pos(240, 140),
+      k.anchor('center'),
+      k.color(0, 0, 0),
+      k.opacity(0),
+      k.z(119),
+    ]);
+
+    const toastText = k.add([
       k.text('', { size: 26 }),
       k.pos(240, 140),
       k.anchor('center'),
       k.color(255, 255, 255),
       k.opacity(0),
       k.z(120),
-      {
-        show(msg, color = k.rgb(255, 255, 255)) {
-          this.text = msg;
-          this.color = color;
-          this.opacity = 1;
-          this._t = 0;
-        },
-        _t: 0,
-      }
     ]);
 
+    const toast = {
+      _t: 0,
+      show(msg, color = k.rgb(255, 255, 255)) {
+        toastText.text = msg;
+        toastText.color = color;
+        toastText.opacity = 1;
+        toastBg.opacity = 0.72;
+        this._t = 0;
+      }
+    };
+
     k.onUpdate(() => {
-      if (toast.opacity > 0) {
+      if (toastText.opacity > 0) {
         toast._t += k.dt();
-        if (toast._t > 1.2) toast.opacity = Math.max(0, toast.opacity - 2 * k.dt());
+        if (toast._t > 1.2) {
+          const fade = Math.max(0, toastText.opacity - 2 * k.dt());
+          toastText.opacity = fade;
+          toastBg.opacity = fade * 0.72;
+        }
       }
     });
 
@@ -975,29 +1026,31 @@ function createScenes(k, preloadedAssets) {
       const p = k.mousePos();
 
       if (lastPos) {
-        // Visible slice trail: a short black slash segment between points
+        // Slice trail: continuous line via interpolation
         const ax = lastPos.x, ay = lastPos.y;
         const bx = p.x, by = p.y;
         const dx = bx - ax;
         const dy = by - ay;
         const len = Math.sqrt(dx * dx + dy * dy);
 
-        if (len > 2) {
-          const mx = (ax + bx) / 2;
-          const my = (ay + by) / 2;
-          const ang = Math.atan2(dy, dx) * 180 / Math.PI;
-          const thickness = 10;
+        if (len > 1) {
+          // Interpolate points every 8px to ensure continuity
+          const steps = Math.ceil(len / 8);
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const ix = ax + dx * t;
+            const iy = ay + dy * t;
 
-          k.add([
-            k.rect(len, thickness, { radius: thickness / 2 }),
-            k.pos(mx, my),
-            k.anchor('center'),
-            k.rotate(ang),
-            k.color(0, 0, 0),
-            k.opacity(0.35),
-            k.z(150),
-            k.lifespan(0.10, { fade: 0.06 }),
-          ]);
+            k.add([
+              k.circle(6),
+              k.pos(ix, iy),
+              k.anchor('center'),
+              k.color(0, 0, 0),
+              k.opacity(0.45),
+              k.z(150),
+              k.lifespan(0.12, { fade: 0.06 }),
+            ]);
+          }
         }
 
         trySliceBetween(lastPos, p);
