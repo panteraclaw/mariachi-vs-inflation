@@ -651,7 +651,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('Tips cortos (se ven también mientras juegas)', { size: 16, width: 420, align: 'center' }),
+      k.text('Por qué Bitcoin protege tu ahorro (simple y directo)', { size: 16, width: 420, align: 'center' }),
       k.pos(240, 190),
       k.anchor('center'),
       k.color(230, 240, 255),
@@ -659,13 +659,64 @@ function createScenes(k, preloadedAssets) {
       k.z(2),
     ]);
 
-    let page = 0;
-    const perPage = 8;
-    const totalPages = Math.max(1, Math.ceil(eduTips.length / perPage));
+    const learnPages = [
+      {
+        title: '1) ¿Qué es la inflación?',
+        body: [
+          'Inflación = los precios suben con el tiempo.',
+          'Eso hace que tu dinero compre menos.',
+          'Aunque ahorres, tu poder adquisitivo puede caer.',
+        ].join('\n\n'),
+      },
+      {
+        title: '2) ¿Qué es Bitcoin?',
+        body: [
+          'Bitcoin es dinero digital global.',
+          'Tiene oferta fija: solo existirán 21M BTC.',
+          'Nadie puede “imprimir” más para devaluarlo.',
+        ].join('\n\n'),
+      },
+      {
+        title: '3) ¿Por qué es refugio vs inflación?',
+        body: [
+          'Si algo es escaso y la demanda crece, su valor tiende a sostenerse o subir.',
+          'El fiat suele expandirse → tu ahorro se diluye.',
+          'Bitcoin es escaso por diseño → protege tu ahorro a largo plazo.',
+        ].join('\n\n'),
+      },
+      {
+        title: '4) Coordinación ciudadana descentralizada',
+        body: [
+          'No depende de un banco o gobierno.',
+          'Miles de nodos verifican reglas y evitan trampas.',
+          'Es una red abierta: cualquiera puede participar y validar.',
+        ].join('\n\n'),
+      },
+      {
+        title: '5) En este juego (resumen)',
+        body: [
+          'Corta INFLACIÓN para ahorrar pesos.',
+          'GUARDA/INVIERTE en BTC: déjalo pasar (+50).',
+          'Si cortas BTC: pierdes 1 vida completa.',
+          'Tip: activa “mensajes educativos” en ⚙ para aprender jugando.',
+        ].join('\n\n'),
+      },
+    ];
 
-    const tipsText = k.add([
-      k.text('', { size: 18, width: 420, lineSpacing: 10 }),
-      k.pos(240, 420),
+    let page = 0;
+    const totalPages = learnPages.length;
+
+    const pageTitle = k.add([
+      k.text('', { size: 22, width: 420, align: 'center' }),
+      k.pos(240, 250),
+      k.anchor('center'),
+      k.color(255, 220, 140),
+      k.z(2),
+    ]);
+
+    const pageBody = k.add([
+      k.text('', { size: 18, width: 420, lineSpacing: 12, align: 'center' }),
+      k.pos(240, 450),
       k.anchor('center'),
       k.color(255, 255, 255),
       k.z(2),
@@ -681,9 +732,9 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     const render = () => {
-      const start = page * perPage;
-      const slice = eduTips.slice(start, start + perPage);
-      tipsText.text = slice.map(t => `• ${t}`).join('\n');
+      const p = learnPages[page];
+      pageTitle.text = p.title;
+      pageBody.text = p.body;
       pageText.text = `${page + 1}/${totalPages}`;
     };
 
