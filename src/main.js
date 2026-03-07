@@ -475,7 +475,6 @@ function createScenes(k, preloadedAssets) {
   k.scene('gameover', (data) => {
     const score = data?.score ?? 0;
     const bitcoins = data?.bitcoins ?? 0;
-    const pesos = data?.pesos ?? 0;
 
     k.setGravity(0);
 
@@ -512,7 +511,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     const summary = [
-      `Ahorraste $${pesos} pesos`,
+      `Ahorraste $${score} pesos`,
       `cortando la inflación`,
       ``,
       `Bitcoin guardados: ${bitcoins}`,
@@ -520,15 +519,115 @@ function createScenes(k, preloadedAssets) {
 
     k.add([
       k.text(summary, { size: 22, width: 420, align: 'center', lineSpacing: 12 }),
-      k.pos(240, 260),
+      k.pos(240, 240),
       k.anchor('center'),
       k.color(240, 245, 255),
       k.z(2),
     ]);
 
+    // Name input section
+    k.add([
+      k.text('Guarda tu puntuación:', { size: 18 }),
+      k.pos(240, 340),
+      k.anchor('center'),
+      k.color(255, 220, 140),
+      k.z(2),
+    ]);
+
+    let playerName = '';
+    let saved = false;
+
+    const nameBox = k.add([
+      k.rect(260, 42, { radius: 12 }),
+      k.pos(240, 380),
+      k.anchor('center'),
+      k.color(40, 50, 70),
+      k.outline(2, k.rgb(150, 160, 180)),
+      k.z(2),
+    ]);
+
+    const nameDisplay = k.add([
+      k.text('', { size: 20 }),
+      k.pos(240, 380),
+      k.anchor('center'),
+      k.color(230, 240, 255),
+      k.z(3),
+    ]);
+
+    const placeholderText = k.add([
+      k.text('Escribe tu nombre...', { size: 18 }),
+      k.pos(240, 380),
+      k.anchor('center'),
+      k.color(120, 130, 150),
+      k.opacity(0.6),
+      k.z(3),
+    ]);
+
+    k.onCharInput((ch) => {
+      if (saved) return;
+      if (playerName.length < 20) {
+        playerName += ch;
+        nameDisplay.text = playerName;
+        placeholderText.opacity = 0;
+      }
+    });
+
+    k.onKeyPress('backspace', () => {
+      if (saved) return;
+      playerName = playerName.slice(0, -1);
+      nameDisplay.text = playerName;
+      if (playerName.length === 0) {
+        placeholderText.opacity = 0.6;
+      }
+    });
+
+    // Save button (green checkmark)
+    const saveBtn = k.add([
+      k.rect(100, 42, { radius: 12 }),
+      k.pos(340, 380),
+      k.anchor('center'),
+      k.color(60, 180, 100),
+      k.outline(2, k.rgb(120, 220, 160)),
+      k.area(),
+      k.z(2),
+    ]);
+
+    k.add([
+      k.text('✓ Guardar', { size: 18 }),
+      k.pos(340, 380),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.z(3),
+    ]);
+
+    const saveName = () => {
+      if (saved || playerName.length === 0) return;
+      saved = true;
+      
+      fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: playerName, score, bitcoins })
+      })
+        .then(() => {
+          nameDisplay.text = '✓ Guardado!';
+          nameDisplay.color = k.rgb(120, 220, 160);
+        })
+        .catch(() => {
+          nameDisplay.text = 'Error';
+          nameDisplay.color = k.rgb(255, 100, 100);
+        });
+    };
+
+    saveBtn.onClick(saveName);
+    saveBtn.onHover(() => k.setCursor('pointer'));
+    saveBtn.onHoverEnd(() => k.setCursor('default'));
+
+    k.onKeyPress('enter', saveName);
+
     const makeBtn = (label, y, onClick, opts = {}) => {
-      const w = opts.w ?? 280;
-      const h = opts.h ?? 46;
+      const w = opts.w ?? 260;
+      const h = opts.h ?? 42;
       const radius = 16;
 
       // Shadow
@@ -575,27 +674,27 @@ function createScenes(k, preloadedAssets) {
       return b;
     };
 
-    // Mobile layout (requested order)
-    makeBtn('JUGAR OTRA VEZ', 520, () => k.go('game'));
+    // Mobile layout (requested order) - smaller buttons, tighter spacing
+    makeBtn('JUGAR OTRA VEZ', 470, () => k.go('game'));
 
-    makeBtn('COMPARTIR PUNTUACIÓN', 580, () => {
+    makeBtn('COMPARTIR PUNTUACIÓN', 525, () => {
       const gameUrl = 'https://mariachi-vs-inflation.vercel.app';
       const text = encodeURIComponent(
-        `Ahorré $${pesos} pesos cortando la inflación. BTC guardados: ${bitcoins}. ¿Cuánto podrás ahorrar? ${gameUrl}`
+        `Ahorré $${score} pesos cortando la inflación. BTC guardados: ${bitcoins}. ¿Cuánto podrás ahorrar? ${gameUrl}`
       );
       const url = `https://twitter.com/intent/tweet?text=${text}`;
       window.open(url, '_blank');
-    }, { w: 360 });
+    }, { w: 300 });
 
-    makeBtn('LEADERBOARD', 640, () => {
+    makeBtn('LEADERBOARD', 580, () => {
       k.go('leaderboard', { score, bitcoins });
     });
 
-    makeBtn('APRENDE SOBRE INFLACIÓN', 700, () => {
+    makeBtn('APRENDE SOBRE INFLACIÓN', 635, () => {
       window.open('https://inflacionmexico.com', '_blank');
-    }, { w: 360 });
+    }, { w: 300 });
 
-    makeBtn('COMPRA BITCOIN', 760, () => {
+    makeBtn('COMPRA BITCOIN', 690, () => {
       window.open('https://www.aureobitcoin.com/es', '_blank');
     });
 
@@ -654,10 +753,14 @@ function createScenes(k, preloadedAssets) {
     gain.gain.value = settings.sfxVolume;
 
     if (type === 'slice') {
-      osc.frequency.value = 800;
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+      // Sword slash "shhh" sound
+      osc.type = 'sawtooth';
+      osc.frequency.value = 400;
+      osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.12);
+      gain.gain.value = settings.sfxVolume * 0.6;
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
       osc.start();
-      osc.stop(ctx.currentTime + 0.08);
+      osc.stop(ctx.currentTime + 0.12);
     } else if (type === 'btc-error') {
       osc.frequency.value = 200;
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
@@ -679,12 +782,14 @@ function createScenes(k, preloadedAssets) {
   }
 
   const eduTips = [
-    'Bitcoin tiene un suministro fijo de 21 millones',
-    'La inflación reduce el poder adquisitivo del dinero',
-    'Bitcoin es desinflacionario por diseño',
-    'Cada 4 años se reduce a la mitad la emisión de BTC',
-    'HODLear = mantener Bitcoin a largo plazo',
-    'Protege tu ahorro de la devaluación',
+    'BTC: suministro fijo de 21M',
+    'Inflación reduce tu poder adquisitivo',
+    'Bitcoin es desinflacionario',
+    'Cada 4 años: halving de BTC',
+    'HODL = mantener BTC largo plazo',
+    'Protege tu ahorro',
+    'BTC es refugio vs inflación',
+    'Tu dinero pierde valor con inflación',
   ];
 
   // ===== LEADERBOARD SCENE =====
@@ -1016,14 +1121,22 @@ function createScenes(k, preloadedAssets) {
         settings.sfxVolume = Math.max(0, settings.sfxVolume - 0.1);
         k.go('game');
       });
+      volDown.onHover(() => k.setCursor('pointer'));
+      volDown.onHoverEnd(() => k.setCursor('default'));
+
       volUp.onClick(() => {
         settings.sfxVolume = Math.min(1, settings.sfxVolume + 0.1);
         k.go('game');
       });
+      volUp.onHover(() => k.setCursor('pointer'));
+      volUp.onHoverEnd(() => k.setCursor('default'));
+
       muteBtn.onClick(() => {
         settings.sfxVolume = 0;
         k.go('game');
       });
+      muteBtn.onHover(() => k.setCursor('pointer'));
+      muteBtn.onHoverEnd(() => k.setCursor('default'));
 
       k.add([
         k.text(`Mensajes educativos: ${settings.eduMessages ? 'ON' : 'OFF'}`, { size: 20 }),
@@ -1047,6 +1160,8 @@ function createScenes(k, preloadedAssets) {
         settings.eduMessages = !settings.eduMessages;
         k.go('game');
       });
+      toggleEdu.onHover(() => k.setCursor('pointer'));
+      toggleEdu.onHoverEnd(() => k.setCursor('default'));
 
       const closeBtn = k.add([
         k.rect(120, 44, { radius: 12 }),
@@ -1062,6 +1177,8 @@ function createScenes(k, preloadedAssets) {
         paused = false;
         k.go('game');
       });
+      closeBtn.onHover(() => k.setCursor('pointer'));
+      closeBtn.onHoverEnd(() => k.setCursor('default'));
     });
     settingsBtn.onHover(() => k.setCursor('pointer'));
     settingsBtn.onHoverEnd(() => k.setCursor('default'));
@@ -1146,11 +1263,9 @@ function createScenes(k, preloadedAssets) {
     }
 
     function endGame() {
-      const pesos = Math.max(0, score) * 10;
       k.go('gameover', {
-        score,
+        score: Math.max(0, score),
         bitcoins: bitcoinCounter,
-        pesos,
       });
     }
 
@@ -1191,6 +1306,8 @@ function createScenes(k, preloadedAssets) {
       ]);
 
       obj.onUpdate(() => {
+        if (paused) return; // Freeze when paused
+
         const dt = k.dt();
         const slow = slowMotion ? 0.55 : 1;
         obj.pos.y += obj.speed * dt * slow;
