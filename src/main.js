@@ -365,7 +365,7 @@ function createScenes(k, preloadedAssets) {
         if (item.label) {
           addObj(k.add([
             k.text(item.label, { size: 13 }),
-            k.pos(x, y + 30),
+            k.pos(x, y + 38),
             k.anchor('center'),
             k.color(200, 210, 230),
             k.z(3),
@@ -412,7 +412,6 @@ function createScenes(k, preloadedAssets) {
         ], [
           { key: 'lightning', label: '⚡ x2 pts' },
           { key: 'bloque', label: '🟧 Freeze' },
-          { key: 'ahorro', label: '🌱 Limpia' },
           { key: 'nodo', label: '🔷 +Vida' },
         ]);
       }
@@ -581,10 +580,10 @@ function createScenes(k, preloadedAssets) {
       }
     });
 
-    // Save button (green checkmark)
+    // Save button (floppy disk icon)
     const saveBtn = k.add([
-      k.rect(100, 42, { radius: 12 }),
-      k.pos(340, 380),
+      k.rect(50, 42, { radius: 12 }),
+      k.pos(310, 380),
       k.anchor('center'),
       k.color(60, 180, 100),
       k.outline(2, k.rgb(120, 220, 160)),
@@ -593,10 +592,9 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('✓ Guardar', { size: 18 }),
-      k.pos(340, 380),
+      k.text('💾', { size: 26 }),
+      k.pos(310, 380),
       k.anchor('center'),
-      k.color(255, 255, 255),
       k.z(3),
     ]);
 
@@ -739,6 +737,7 @@ function createScenes(k, preloadedAssets) {
   const settings = {
     sfxVolume: 0.3,
     eduMessages: true,
+    nightMode: false,
   };
 
   function playSFX(type) {
@@ -753,14 +752,23 @@ function createScenes(k, preloadedAssets) {
     gain.gain.value = settings.sfxVolume;
 
     if (type === 'slice') {
-      // Sword slash "shhh" sound
-      osc.type = 'sawtooth';
-      osc.frequency.value = 400;
-      osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.12);
-      gain.gain.value = settings.sfxVolume * 0.6;
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+      // Sword slash: sharp whoosh sound
+      osc.type = 'square';
+      osc.frequency.value = 600;
+      osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.09);
+      
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 800;
+      filter.Q.value = 2;
+      
+      osc.connect(filter);
+      filter.connect(gain);
+      
+      gain.gain.value = settings.sfxVolume * 0.5;
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.09);
       osc.start();
-      osc.stop(ctx.currentTime + 0.12);
+      osc.stop(ctx.currentTime + 0.09);
     } else if (type === 'btc-error') {
       osc.frequency.value = 200;
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
@@ -1061,122 +1069,131 @@ function createScenes(k, preloadedAssets) {
 
     settingsBtn.onClick(() => {
       paused = true;
-      // Simple settings overlay
-      const overlay = k.add([
+      const overlayObjs = [];
+
+      const addOverlay = (obj) => {
+        overlayObjs.push(obj);
+        return obj;
+      };
+
+      const closeOverlay = () => {
+        overlayObjs.forEach(o => k.destroy(o));
+        paused = false;
+      };
+
+      addOverlay(k.add([
         k.rect(420, 300, { radius: 18 }),
         k.pos(240, 427),
         k.anchor('center'),
         k.color(20, 30, 44),
         k.opacity(0.95),
         k.z(200),
-      ]);
+      ]));
 
-      k.add([
+      addOverlay(k.add([
         k.text('CONFIGURACIÓN', { size: 24 }),
         k.pos(240, 320),
         k.anchor('center'),
         k.color(255, 255, 255),
         k.z(201),
-      ]);
+      ]));
 
-      k.add([
+      const volLabel = addOverlay(k.add([
         k.text(`Volumen SFX: ${Math.round(settings.sfxVolume * 100)}%`, { size: 20 }),
         k.pos(240, 380),
         k.anchor('center'),
         k.color(230, 240, 255),
         k.z(201),
-      ]);
+      ]));
 
-      const volDown = k.add([
+      const volDown = addOverlay(k.add([
         k.rect(60, 40, { radius: 10 }),
         k.pos(140, 420),
         k.anchor('center'),
         k.color(255, 104, 60),
         k.area(),
         k.z(201),
-      ]);
-      k.add([k.text('-', { size: 32 }), k.pos(140, 420), k.anchor('center'), k.z(202)]);
+      ]));
+      addOverlay(k.add([k.text('-', { size: 32 }), k.pos(140, 420), k.anchor('center'), k.z(202)]));
 
-      const volUp = k.add([
+      const volUp = addOverlay(k.add([
         k.rect(60, 40, { radius: 10 }),
         k.pos(240, 420),
         k.anchor('center'),
         k.color(255, 104, 60),
         k.area(),
         k.z(201),
-      ]);
-      k.add([k.text('+', { size: 32 }), k.pos(240, 420), k.anchor('center'), k.z(202)]);
+      ]));
+      addOverlay(k.add([k.text('+', { size: 32 }), k.pos(240, 420), k.anchor('center'), k.z(202)]));
 
-      const muteBtn = k.add([
+      const muteBtn = addOverlay(k.add([
         k.rect(80, 40, { radius: 10 }),
         k.pos(340, 420),
         k.anchor('center'),
         k.color(120, 120, 140),
         k.area(),
         k.z(201),
-      ]);
-      k.add([k.text('Mute', { size: 18 }), k.pos(340, 420), k.anchor('center'), k.z(202)]);
+      ]));
+      addOverlay(k.add([k.text('Mute', { size: 18 }), k.pos(340, 420), k.anchor('center'), k.z(202)]));
 
       volDown.onClick(() => {
         settings.sfxVolume = Math.max(0, settings.sfxVolume - 0.1);
-        k.go('game');
+        volLabel.text = `Volumen SFX: ${Math.round(settings.sfxVolume * 100)}%`;
       });
       volDown.onHover(() => k.setCursor('pointer'));
       volDown.onHoverEnd(() => k.setCursor('default'));
 
       volUp.onClick(() => {
         settings.sfxVolume = Math.min(1, settings.sfxVolume + 0.1);
-        k.go('game');
+        volLabel.text = `Volumen SFX: ${Math.round(settings.sfxVolume * 100)}%`;
       });
       volUp.onHover(() => k.setCursor('pointer'));
       volUp.onHoverEnd(() => k.setCursor('default'));
 
       muteBtn.onClick(() => {
         settings.sfxVolume = 0;
-        k.go('game');
+        volLabel.text = `Volumen SFX: 0%`;
       });
       muteBtn.onHover(() => k.setCursor('pointer'));
       muteBtn.onHoverEnd(() => k.setCursor('default'));
 
-      k.add([
+      const eduLabel = addOverlay(k.add([
         k.text(`Mensajes educativos: ${settings.eduMessages ? 'ON' : 'OFF'}`, { size: 20 }),
         k.pos(240, 480),
         k.anchor('center'),
         k.color(230, 240, 255),
         k.z(201),
-      ]);
+      ]));
 
-      const toggleEdu = k.add([
+      const toggleEdu = addOverlay(k.add([
         k.rect(100, 40, { radius: 10 }),
         k.pos(240, 520),
         k.anchor('center'),
-        k.color(255, 104, 60),
+        k.color(settings.eduMessages ? k.rgb(60, 180, 100) : k.rgb(120, 120, 140)),
         k.area(),
         k.z(201),
-      ]);
-      k.add([k.text('Toggle', { size: 18 }), k.pos(240, 520), k.anchor('center'), k.z(202)]);
+      ]));
+      addOverlay(k.add([k.text('Toggle', { size: 18 }), k.pos(240, 520), k.anchor('center'), k.z(202)]));
 
       toggleEdu.onClick(() => {
         settings.eduMessages = !settings.eduMessages;
-        k.go('game');
+        eduLabel.text = `Mensajes educativos: ${settings.eduMessages ? 'ON' : 'OFF'}`;
+        toggleEdu.color = settings.eduMessages ? k.rgb(60, 180, 100) : k.rgb(120, 120, 140);
       });
       toggleEdu.onHover(() => k.setCursor('pointer'));
       toggleEdu.onHoverEnd(() => k.setCursor('default'));
 
-      const closeBtn = k.add([
+      const closeBtn = addOverlay(k.add([
         k.rect(120, 44, { radius: 12 }),
         k.pos(240, 580),
         k.anchor('center'),
         k.color(255, 104, 60),
         k.area(),
         k.z(201),
-      ]);
-      k.add([k.text('VOLVER', { size: 20 }), k.pos(240, 580), k.anchor('center'), k.z(202)]);
+      ]));
+      addOverlay(k.add([k.text('VOLVER', { size: 20 }), k.pos(240, 580), k.anchor('center'), k.z(202)]));
 
-      closeBtn.onClick(() => {
-        paused = false;
-        k.go('game');
-      });
+      closeBtn.onClick(closeOverlay);
       closeBtn.onHover(() => k.setCursor('pointer'));
       closeBtn.onHoverEnd(() => k.setCursor('default'));
     });
@@ -1186,9 +1203,9 @@ function createScenes(k, preloadedAssets) {
     // Educational messages timer
     let eduTimer = 0;
 
-    // Toast with background for visibility
+    // Toast with background for visibility (larger for edu messages)
     const toastBg = k.add([
-      k.rect(400, 50, { radius: 12 }),
+      k.rect(440, 70, { radius: 12 }),
       k.pos(240, 140),
       k.anchor('center'),
       k.color(0, 0, 0),
@@ -1197,7 +1214,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     const toastText = k.add([
-      k.text('', { size: 26 }),
+      k.text('', { size: 22, width: 420 }),
       k.pos(240, 140),
       k.anchor('center'),
       k.color(255, 255, 255),
