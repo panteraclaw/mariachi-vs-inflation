@@ -398,7 +398,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('APRENDE A JUGAR', { size: 30 }),
+      k.text(t('menu_tutorial'), { size: 30 }),
       k.pos(240, 90),
       k.anchor('center'),
       k.color(255, 255, 255),
@@ -1307,7 +1307,7 @@ function createScenes(k, preloadedAssets) {
       })
       .catch(() => {
         k.add([
-          k.text('Error al cargar', { size: 20 }),
+          k.text(t('leaderboard_error'), { size: 20 }),
           k.pos(240, listY + 100),
           k.anchor('center'),
           k.color(255, 100, 100),
@@ -1318,7 +1318,7 @@ function createScenes(k, preloadedAssets) {
     // Save score section (if coming from game over)
     if (myScore !== undefined) {
       k.add([
-        k.text('Guarda tu puntuación:', { size: 22 }),
+        k.text(t('gameover_save_prompt'), { size: 22 }),
         k.pos(240, 620),
         k.anchor('center'),
         k.color(255, 255, 255),
@@ -1326,7 +1326,7 @@ function createScenes(k, preloadedAssets) {
       ]);
 
       k.add([
-        k.text('(Ingresa tu nombre y presiona Enter)', { size: 16 }),
+        k.text(t('leaderboard_name_hint'), { size: 16 }),
         k.pos(240, 650),
         k.anchor('center'),
         k.color(200, 210, 230),
@@ -1445,14 +1445,14 @@ function createScenes(k, preloadedAssets) {
 
     // --- UI ---
     const scoreText = k.add([
-      k.text('Score: 0', { size: 22 }),
+      k.text(`${t('game_score')}: 0`, { size: 22 }),
       k.pos(18, 18),
       k.color(255, 255, 255),
       k.z(100),
     ]);
 
     const btcText = k.add([
-      k.text('BTC: 0', { size: 22 }),
+      k.text(`${t('game_btc')}: 0`, { size: 22 }),
       k.pos(18, 46),
       k.color(255, 220, 140),
       k.z(100),

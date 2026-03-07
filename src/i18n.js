@@ -135,6 +135,7 @@ export const i18n = {
     leaderboard_name_prompt: 'Ingresa tu nombre',
     leaderboard_name_hint: '(Ingresa tu nombre y presiona Enter)',
     leaderboard_loading: 'Cargando...',
+    leaderboard_error: 'Error al cargar',
   },
   
   en: {
@@ -272,6 +273,7 @@ export const i18n = {
     leaderboard_name_prompt: 'Enter your name',
     leaderboard_name_hint: '(Enter your name and press Enter)',
     leaderboard_loading: 'Loading...',
+    leaderboard_error: 'Error loading',
   }
 };
 
