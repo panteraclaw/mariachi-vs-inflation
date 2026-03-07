@@ -72,6 +72,7 @@ function initGame(preloadedAssets) {
   
   // Load all sprites
   k.loadSprite('background', '/assets/background.png');
+  k.loadSprite('background-night', '/assets/background-night.png');
   k.loadSprite('logo', '/assets/logo.png');
   k.loadSprite('mariachi', '/assets/mariachi.png');
 
@@ -100,6 +101,9 @@ function createScenes(k, preloadedAssets) {
   const logoData = preloadedAssets.find(a => a.url.includes('logo'));
   const mariachiData = preloadedAssets.find(a => a.url.includes('mariachi'));
 
+  // Helper to get current background sprite
+  const getBg = () => settings.nightMode ? 'background-night' : 'background';
+
   // ===== MENU SCENE =====
   k.scene('menu', () => {
     k.setGravity(0);
@@ -119,13 +123,38 @@ function createScenes(k, preloadedAssets) {
       const bgScale = Math.max(scaleX, scaleY);
 
       k.add([
-        k.sprite('background'),
+        k.sprite(getBg()),
         k.pos(240, 427),
         k.anchor('center'),
         k.scale(bgScale),
         k.z(0),
       ]);
     }
+
+    // Night mode toggle button (top-right)
+    const nightBtn = k.add([
+      k.rect(50, 50, { radius: 25 }),
+      k.pos(430, 30),
+      k.anchor('center'),
+      k.color(100, 100, 120),
+      k.outline(2, k.rgb(180, 180, 200)),
+      k.area(),
+      k.z(100),
+    ]);
+
+    k.add([
+      k.text(settings.nightMode ? '☀️' : '🌙', { size: 28 }),
+      k.pos(430, 30),
+      k.anchor('center'),
+      k.z(101),
+    ]);
+
+    nightBtn.onClick(() => {
+      settings.nightMode = !settings.nightMode;
+      k.go('menu');
+    });
+    nightBtn.onHover(() => k.setCursor('pointer'));
+    nightBtn.onHoverEnd(() => k.setCursor('default'));
 
     // Logo - top center
     if (logoData) {
@@ -280,7 +309,7 @@ function createScenes(k, preloadedAssets) {
       const bgScale = Math.max(scaleX, scaleY);
 
       k.add([
-        k.sprite('background'),
+        k.sprite(getBg()),
         k.pos(240, 427),
         k.anchor('center'),
         k.scale(bgScale),
@@ -483,7 +512,7 @@ function createScenes(k, preloadedAssets) {
       const bgScale = Math.max(scaleX, scaleY);
 
       k.add([
-        k.sprite('background'),
+        k.sprite(getBg()),
         k.pos(240, 427),
         k.anchor('center'),
         k.scale(bgScale),
@@ -813,7 +842,7 @@ function createScenes(k, preloadedAssets) {
       const bgScale = Math.max(scaleX, scaleY);
 
       k.add([
-        k.sprite('background'),
+        k.sprite(getBg()),
         k.pos(240, 427),
         k.anchor('center'),
         k.scale(bgScale),
@@ -965,7 +994,7 @@ function createScenes(k, preloadedAssets) {
       const bgScale = Math.max(scaleX, scaleY);
 
       k.add([
-        k.sprite('background'),
+        k.sprite(getBg()),
         k.pos(240, 427),
         k.anchor('center'),
         k.scale(bgScale),
