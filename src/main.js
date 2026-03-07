@@ -2,9 +2,9 @@ import kaplay from 'kaplay';
 
 // Assets to preload
 const ASSETS_TO_LOAD = [
-  '/assets/background.jpg',
-  '/assets/logo.jpg',
-  '/assets/mariachi.jpg'
+  '/assets/background.png',
+  '/assets/logo.png',
+  '/assets/mariachi.png'
 ];
 
 // Preload images
@@ -59,9 +59,9 @@ function initGame(preloadedAssets) {
   k.canvas.classList.add('loaded');
   
   // Load all sprites
-  k.loadSprite('background', '/assets/background.jpg');
-  k.loadSprite('logo', '/assets/logo.jpg');
-  k.loadSprite('mariachi', '/assets/mariachi.jpg');
+  k.loadSprite('background', '/assets/background.png');
+  k.loadSprite('logo', '/assets/logo.png');
+  k.loadSprite('mariachi', '/assets/mariachi.png');
   
   k.onLoad(() => {
     createScenes(k, preloadedAssets);
