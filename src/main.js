@@ -17,26 +17,30 @@ function preloadImages(urls) {
   );
 }
 
-// Simple loading (no flash)
+// Loading screen (only show if loading takes time)
 const loadingScreen = document.getElementById('loading-screen');
+let loadingTimeout = setTimeout(() => {
+  if (loadingScreen) loadingScreen.classList.add('show');
+}, 200); // Only show if loading takes more than 200ms
 
 preloadImages(ASSETS_TO_LOAD)
   .then((loadedAssets) => {
-    // Remove loading screen instantly
+    clearTimeout(loadingTimeout);
     if (loadingScreen) loadingScreen.remove();
     initGame(loadedAssets);
   })
   .catch((err) => {
     console.error('Error loading assets:', err);
+    clearTimeout(loadingTimeout);
     const textEl = document.getElementById('loading-text');
     if (textEl) {
       textEl.textContent = 'Error. Refresca la página.';
       textEl.style.color = '#ff6432';
     }
+    if (loadingScreen) loadingScreen.classList.add('show');
   });
 
 function initGame(preloadedAssets) {
-  // Get real image dimensions from preload
   const bannerDimensions = preloadedAssets.find(a => a.url.includes('menu-banner'));
   
   const k = kaplay({
@@ -72,7 +76,7 @@ function createScenes(k, bannerDimensions) {
       k.z(-1),
     ]);
 
-    // Banner with REAL dimensions
+    // Banner
     if (bannerDimensions) {
       const realWidth = bannerDimensions.width;
       const realHeight = bannerDimensions.height;
@@ -88,14 +92,12 @@ function createScenes(k, bannerDimensions) {
         k.scale(scale),
         k.z(0),
       ]);
-      
-      console.log(`✓ Banner: ${realWidth}x${realHeight}, scale: ${scale}`);
     }
 
-    // JUGAR button (at bottom, inside banner area)
+    // JUGAR button
     const btn = k.add([
       k.rect(240, 70, { radius: 12 }),
-      k.pos(240, 770), // Moved up to be inside banner
+      k.pos(240, 770),
       k.anchor('center'),
       k.color(255, 100, 50),
       k.area(),
@@ -111,17 +113,18 @@ function createScenes(k, bannerDimensions) {
       k.z(10),
     ]);
 
+    // ONLY button activates game (removed global onClick)
     btn.onClick(() => k.go('game'));
+    
     btn.onHover(() => {
       btn.color = k.rgb(255, 120, 70);
       k.setCursor('pointer');
     });
+    
     btn.onHoverEnd(() => {
       btn.color = k.rgb(255, 100, 50);
       k.setCursor('default');
     });
-
-    k.onClick(() => k.go('game'));
   });
 
   // ===== GAME SCENE =====
