@@ -8,10 +8,16 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "keywords": ["game", "arcade", "bitcoin", "education"],
+  "keywords": [
+    "game",
+    "arcade",
+    "bitcoin",
+    "education"
+  ],
   "author": "PanteraClaw",
   "license": "MIT",
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "kaplay": "^3001.0.19",
     "vite": "^7.3.1"
   }

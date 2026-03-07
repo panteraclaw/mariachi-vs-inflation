@@ -588,7 +588,7 @@ function createScenes(k, preloadedAssets) {
     }, { w: 360 });
 
     makeBtn('LEADERBOARD', 640, () => {
-      // TODO next iteration
+      k.go('leaderboard', { score, bitcoins });
     });
 
     makeBtn('APRENDE SOBRE INFLACIÓN', 700, () => {
@@ -634,6 +634,211 @@ function createScenes(k, preloadedAssets) {
     back.onClick(() => k.go('menu'));
     back.onHover(() => k.setCursor('pointer'));
     back.onHoverEnd(() => k.setCursor('default'));
+  });
+
+  // ===== SETTINGS / SFX =====
+  const settings = {
+    sfxVolume: 0.3,
+    eduMessages: true,
+  };
+
+  function playSFX(type) {
+    if (settings.sfxVolume === 0) return;
+    
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.value = settings.sfxVolume;
+
+    if (type === 'slice') {
+      osc.frequency.value = 800;
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.08);
+    } else if (type === 'btc-error') {
+      osc.frequency.value = 200;
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
+    } else if (type === 'powerup') {
+      osc.frequency.value = 600;
+      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.12);
+    } else if (type === 'combo') {
+      osc.frequency.value = 440;
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.1);
+    }
+  }
+
+  const eduTips = [
+    'Bitcoin tiene un suministro fijo de 21 millones',
+    'La inflación reduce el poder adquisitivo del dinero',
+    'Bitcoin es desinflacionario por diseño',
+    'Cada 4 años se reduce a la mitad la emisión de BTC',
+    'HODLear = mantener Bitcoin a largo plazo',
+    'Protege tu ahorro de la devaluación',
+  ];
+
+  // ===== LEADERBOARD SCENE =====
+  k.scene('leaderboard', (data) => {
+    const myScore = data?.score;
+    const myBitcoins = data?.bitcoins;
+
+    k.setGravity(0);
+
+    if (bgData) {
+      const scaleX = 480 / bgData.width;
+      const scaleY = 854 / bgData.height;
+      const bgScale = Math.max(scaleX, scaleY);
+
+      k.add([
+        k.sprite('background'),
+        k.pos(240, 427),
+        k.anchor('center'),
+        k.scale(bgScale),
+        k.opacity(0.25),
+        k.z(0),
+      ]);
+    }
+
+    k.add([
+      k.rect(460, 800, { radius: 18 }),
+      k.pos(240, 427),
+      k.anchor('center'),
+      k.color(10, 18, 28),
+      k.opacity(0.85),
+      k.z(1),
+    ]);
+
+    k.add([
+      k.text('LEADERBOARD', { size: 36 }),
+      k.pos(240, 100),
+      k.anchor('center'),
+      k.color(255, 220, 140),
+      k.z(2),
+    ]);
+
+    const listY = 180;
+    k.add([
+      k.text('Cargando...', { size: 20 }),
+      k.pos(240, listY),
+      k.anchor('center'),
+      k.color(240, 245, 255),
+      k.z(2),
+    ]);
+
+    // Fetch leaderboard
+    fetch('/api/leaderboard')
+      .then(res => res.json())
+      .then(rows => {
+        k.get('*').forEach(o => {
+          if (o.text === 'Cargando...') k.destroy(o);
+        });
+
+        const lines = rows.slice(0, 10).map((r, i) => 
+          `${i+1}. ${r.name}: ${r.score} pts (${r.bitcoins} BTC)`
+        ).join('\n');
+
+        k.add([
+          k.text(lines || 'Sin registros', { size: 18, width: 420, lineSpacing: 8 }),
+          k.pos(240, listY + 200),
+          k.anchor('center'),
+          k.color(240, 245, 255),
+          k.z(2),
+        ]);
+      })
+      .catch(() => {
+        k.add([
+          k.text('Error al cargar', { size: 20 }),
+          k.pos(240, listY + 100),
+          k.anchor('center'),
+          k.color(255, 100, 100),
+          k.z(2),
+        ]);
+      });
+
+    // Save score section (if coming from game over)
+    if (myScore !== undefined) {
+      k.add([
+        k.text('Guarda tu puntuación:', { size: 22 }),
+        k.pos(240, 620),
+        k.anchor('center'),
+        k.color(255, 255, 255),
+        k.z(2),
+      ]);
+
+      k.add([
+        k.text('(Ingresa tu nombre y presiona Enter)', { size: 16 }),
+        k.pos(240, 650),
+        k.anchor('center'),
+        k.color(200, 210, 230),
+        k.z(2),
+      ]);
+
+      let playerName = '';
+      const nameDisplay = k.add([
+        k.text(playerName || '_', { size: 24 }),
+        k.pos(240, 690),
+        k.anchor('center'),
+        k.color(255, 220, 140),
+        k.z(2),
+      ]);
+
+      k.onCharInput((ch) => {
+        if (playerName.length < 20) {
+          playerName += ch;
+          nameDisplay.text = playerName || '_';
+        }
+      });
+
+      k.onKeyPress('backspace', () => {
+        playerName = playerName.slice(0, -1);
+        nameDisplay.text = playerName || '_';
+      });
+
+      k.onKeyPress('enter', () => {
+        if (playerName.length > 0) {
+          fetch('/api/leaderboard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: playerName, score: myScore, bitcoins: myBitcoins })
+          })
+            .then(() => k.go('leaderboard'))
+            .catch(() => alert('Error al guardar'));
+        }
+      });
+    }
+
+    // Back button
+    const backBtn = k.add([
+      k.rect(200, 48, { radius: 14 }),
+      k.pos(240, 780),
+      k.anchor('center'),
+      k.color(255, 104, 60),
+      k.outline(3, k.rgb(255, 220, 140)),
+      k.area(),
+      k.z(3),
+    ]);
+
+    k.add([
+      k.text('VOLVER', { size: 22 }),
+      k.pos(240, 780),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.z(4),
+    ]);
+
+    backBtn.onClick(() => k.go('menu'));
+    backBtn.onHover(() => k.setCursor('pointer'));
+    backBtn.onHoverEnd(() => k.setCursor('default'));
   });
 
   // ===== GAME SCENE =====
@@ -702,6 +907,167 @@ function createScenes(k, preloadedAssets) {
       k.color(255, 120, 120),
       k.z(100),
     ]);
+
+    // Pause button (top-right)
+    let paused = false;
+    const pauseBtn = k.add([
+      k.rect(50, 50, { radius: 12 }),
+      k.pos(420, 30),
+      k.anchor('center'),
+      k.color(100, 100, 120),
+      k.outline(2, k.rgb(180, 180, 200)),
+      k.area(),
+      k.z(100),
+    ]);
+    k.add([
+      k.text('⏸', { size: 28 }),
+      k.pos(420, 30),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.z(101),
+    ]);
+
+    pauseBtn.onClick(() => {
+      paused = !paused;
+      if (paused) {
+        toast.show('PAUSA', k.rgb(200, 200, 200));
+      }
+    });
+    pauseBtn.onHover(() => k.setCursor('pointer'));
+    pauseBtn.onHoverEnd(() => k.setCursor('default'));
+
+    // Settings button (next to pause)
+    const settingsBtn = k.add([
+      k.rect(50, 50, { radius: 12 }),
+      k.pos(360, 30),
+      k.anchor('center'),
+      k.color(100, 100, 120),
+      k.outline(2, k.rgb(180, 180, 200)),
+      k.area(),
+      k.z(100),
+    ]);
+    k.add([
+      k.text('⚙', { size: 28 }),
+      k.pos(360, 30),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.z(101),
+    ]);
+
+    settingsBtn.onClick(() => {
+      paused = true;
+      // Simple settings overlay
+      const overlay = k.add([
+        k.rect(420, 300, { radius: 18 }),
+        k.pos(240, 427),
+        k.anchor('center'),
+        k.color(20, 30, 44),
+        k.opacity(0.95),
+        k.z(200),
+      ]);
+
+      k.add([
+        k.text('CONFIGURACIÓN', { size: 24 }),
+        k.pos(240, 320),
+        k.anchor('center'),
+        k.color(255, 255, 255),
+        k.z(201),
+      ]);
+
+      k.add([
+        k.text(`Volumen SFX: ${Math.round(settings.sfxVolume * 100)}%`, { size: 20 }),
+        k.pos(240, 380),
+        k.anchor('center'),
+        k.color(230, 240, 255),
+        k.z(201),
+      ]);
+
+      const volDown = k.add([
+        k.rect(60, 40, { radius: 10 }),
+        k.pos(140, 420),
+        k.anchor('center'),
+        k.color(255, 104, 60),
+        k.area(),
+        k.z(201),
+      ]);
+      k.add([k.text('-', { size: 32 }), k.pos(140, 420), k.anchor('center'), k.z(202)]);
+
+      const volUp = k.add([
+        k.rect(60, 40, { radius: 10 }),
+        k.pos(240, 420),
+        k.anchor('center'),
+        k.color(255, 104, 60),
+        k.area(),
+        k.z(201),
+      ]);
+      k.add([k.text('+', { size: 32 }), k.pos(240, 420), k.anchor('center'), k.z(202)]);
+
+      const muteBtn = k.add([
+        k.rect(80, 40, { radius: 10 }),
+        k.pos(340, 420),
+        k.anchor('center'),
+        k.color(120, 120, 140),
+        k.area(),
+        k.z(201),
+      ]);
+      k.add([k.text('Mute', { size: 18 }), k.pos(340, 420), k.anchor('center'), k.z(202)]);
+
+      volDown.onClick(() => {
+        settings.sfxVolume = Math.max(0, settings.sfxVolume - 0.1);
+        k.go('game');
+      });
+      volUp.onClick(() => {
+        settings.sfxVolume = Math.min(1, settings.sfxVolume + 0.1);
+        k.go('game');
+      });
+      muteBtn.onClick(() => {
+        settings.sfxVolume = 0;
+        k.go('game');
+      });
+
+      k.add([
+        k.text(`Mensajes educativos: ${settings.eduMessages ? 'ON' : 'OFF'}`, { size: 20 }),
+        k.pos(240, 480),
+        k.anchor('center'),
+        k.color(230, 240, 255),
+        k.z(201),
+      ]);
+
+      const toggleEdu = k.add([
+        k.rect(100, 40, { radius: 10 }),
+        k.pos(240, 520),
+        k.anchor('center'),
+        k.color(255, 104, 60),
+        k.area(),
+        k.z(201),
+      ]);
+      k.add([k.text('Toggle', { size: 18 }), k.pos(240, 520), k.anchor('center'), k.z(202)]);
+
+      toggleEdu.onClick(() => {
+        settings.eduMessages = !settings.eduMessages;
+        k.go('game');
+      });
+
+      const closeBtn = k.add([
+        k.rect(120, 44, { radius: 12 }),
+        k.pos(240, 580),
+        k.anchor('center'),
+        k.color(255, 104, 60),
+        k.area(),
+        k.z(201),
+      ]);
+      k.add([k.text('VOLVER', { size: 20 }), k.pos(240, 580), k.anchor('center'), k.z(202)]);
+
+      closeBtn.onClick(() => {
+        paused = false;
+        k.go('game');
+      });
+    });
+    settingsBtn.onHover(() => k.setCursor('pointer'));
+    settingsBtn.onHoverEnd(() => k.setCursor('default'));
+
+    // Educational messages timer
+    let eduTimer = 0;
 
     // Toast with background for visibility
     const toastBg = k.add([
@@ -904,6 +1270,7 @@ function createScenes(k, preloadedAssets) {
       if (INFLATION_SPRITES.includes(obj.kind)) {
         inflationCutsThisSwipe += 1;
         addScore(10);
+        playSFX('slice');
         k.destroy(obj);
         return;
       }
@@ -915,6 +1282,7 @@ function createScenes(k, preloadedAssets) {
         bitcoinStreak = 0;
         bitcoinCuts += 1;
         damageHeart();
+        playSFX('btc-error');
 
         if (bitcoinCuts >= 3) {
           toast.show('PAPER HANDS! ☠', k.rgb(255, 180, 120));
@@ -933,6 +1301,7 @@ function createScenes(k, preloadedAssets) {
         scoreMultiplier = 2;
         multiplierUntil = elapsed + 3;
         toast.show('DOBLE PUNTOS x2 (3s)', k.rgb(255, 255, 180));
+        playSFX('powerup');
         k.destroy(obj);
         return;
       }
@@ -941,6 +1310,7 @@ function createScenes(k, preloadedAssets) {
         slowMotion = true;
         slowUntil = elapsed + 4;
         toast.show('TIME FREEZE (4s)', k.rgb(200, 220, 255));
+        playSFX('powerup');
         k.destroy(obj);
         return;
       }
@@ -949,6 +1319,7 @@ function createScenes(k, preloadedAssets) {
         addScore(100);
         explodeAhorro();
         toast.show('AHORRO: LIMPIEZA +100', k.rgb(140, 255, 190));
+        playSFX('powerup');
         k.destroy(obj);
         return;
       }
@@ -958,6 +1329,7 @@ function createScenes(k, preloadedAssets) {
         hearts = Math.min(3, hearts + 1);
         heartDamage = 0;
         toast.show('VIDA EXTRA +1', k.rgb(170, 220, 255));
+        playSFX('powerup');
         refreshUI();
         k.destroy(obj);
         return;
@@ -1007,14 +1379,17 @@ function createScenes(k, preloadedAssets) {
       if (c === 2) {
         addScore(20);
         toast.show('COMBO x2 +20', k.rgb(255, 255, 255));
+        playSFX('combo');
       }
       else if (c === 3) {
         addScore(40);
         toast.show('COMBO x3 +40', k.rgb(255, 255, 255));
+        playSFX('combo');
       }
       else if (c >= 4) {
         addScore(80);
         toast.show('COMBO x4 +80', k.rgb(255, 255, 255));
+        playSFX('combo');
       }
 
       inflationCutsThisSwipe = 0;
@@ -1063,8 +1438,18 @@ function createScenes(k, preloadedAssets) {
     let spawnTimer = 0;
 
     k.onUpdate(() => {
+      if (paused) return; // Freeze everything when paused
+
       const dt = k.dt();
       elapsed += dt;
+      eduTimer += dt;
+
+      // Educational messages every 25 seconds
+      if (settings.eduMessages && eduTimer > 25) {
+        eduTimer = 0;
+        const tip = eduTips[Math.floor(Math.random() * eduTips.length)];
+        toast.show(tip, k.rgb(255, 220, 140));
+      }
 
       // expire powerups
       if (scoreMultiplier !== 1 && elapsed > multiplierUntil) scoreMultiplier = 1;
