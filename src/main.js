@@ -71,7 +71,7 @@ function initGame(preloadedAssets) {
   console.log('📦 Loading sprites into KAPLAY...');
   k.loadSprite('menu-banner', '/assets/menu-banner.jpg');
   
-  // CRITICAL: Wait for KAPLAY to finish loading sprites
+  // Wait for KAPLAY to finish loading sprites
   k.onLoad(() => {
     console.log('✓ KAPLAY finished loading all sprites');
     createScenes(k);
@@ -94,26 +94,39 @@ function createScenes(k) {
       k.z(-1),
     ]);
 
-    // Banner sprite (GUARANTEED to be loaded now)
-    const spriteData = k.getSprite('menu-banner');
-    console.log('🖼️ Sprite data:', spriteData);
-
-    if (spriteData && spriteData.width > 0) {
-      const scaleX = 480 / spriteData.width;
-      const scaleY = 854 / spriteData.height;
-      const scale = Math.max(scaleX, scaleY);
-
-      k.add([
-        k.sprite('menu-banner'),
-        k.pos(240, 427),
-        k.anchor('center'),
-        k.scale(scale),
-        k.z(0),
-      ]);
+    // Banner sprite
+    try {
+      const spriteData = k.getSprite('menu-banner');
+      console.log('🖼️ Full sprite object:', spriteData);
+      console.log('🖼️ sprite.data:', spriteData?.data);
+      console.log('🖼️ sprite.loaded:', spriteData?.loaded);
       
-      console.log('✓ Banner displayed (scale:', scale, ')');
-    } else {
-      console.error('❌ Banner sprite STILL not ready after onLoad');
+      // Check if sprite is loaded
+      if (spriteData && spriteData.loaded) {
+        // Get actual dimensions from the data
+        const imgWidth = spriteData.data?.tex?.width || spriteData.width || 853;
+        const imgHeight = spriteData.data?.tex?.height || spriteData.height || 1280;
+        
+        console.log(`✓ Using dimensions: ${imgWidth}x${imgHeight}`);
+        
+        const scaleX = 480 / imgWidth;
+        const scaleY = 854 / imgHeight;
+        const scale = Math.max(scaleX, scaleY);
+
+        k.add([
+          k.sprite('menu-banner'),
+          k.pos(240, 427),
+          k.anchor('center'),
+          k.scale(scale),
+          k.z(0),
+        ]);
+        
+        console.log('✓ Banner displayed (scale:', scale, ')');
+      } else {
+        console.error('❌ Sprite not loaded');
+      }
+    } catch (err) {
+      console.error('❌ Error displaying banner:', err);
     }
 
     // JUGAR button
