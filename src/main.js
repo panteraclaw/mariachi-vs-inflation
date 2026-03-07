@@ -680,8 +680,8 @@ function createScenes(k, preloadedAssets) {
         title: '3) ¿Por qué es refugio vs inflación?',
         body: [
           'Si algo es escaso y la demanda crece, su valor tiende a sostenerse o subir.',
-          'El fiat suele expandirse → tu ahorro se diluye.',
-          'Bitcoin es escaso por diseño → protege tu ahorro a largo plazo.',
+          'El dinero tradicional (pesos, dólares) suele emitirse más con el tiempo → tu ahorro se diluye.',
+          'Bitcoin es escaso por diseño → puede proteger tu ahorro a largo plazo.',
         ].join('\n\n'),
       },
       {
@@ -1135,13 +1135,49 @@ function createScenes(k, preloadedAssets) {
     nightMode: false,
   };
 
+  // WebAudio needs a user gesture to play on mobile (iOS/Android)
+  let audioCtx = null;
+  let audioUnlocked = false;
+
+  function ensureAudioUnlocked() {
+    try {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state !== 'running') {
+        audioCtx.resume();
+      }
+      audioUnlocked = true;
+    } catch {
+      // ignore
+    }
+  }
+
+  // Try to unlock audio on first interaction
+  if (typeof window !== 'undefined') {
+    const unlockOnce = () => {
+      ensureAudioUnlocked();
+      window.removeEventListener('pointerdown', unlockOnce);
+      window.removeEventListener('touchstart', unlockOnce);
+      window.removeEventListener('mousedown', unlockOnce);
+      window.removeEventListener('keydown', unlockOnce);
+    };
+    window.addEventListener('pointerdown', unlockOnce, { passive: true });
+    window.addEventListener('touchstart', unlockOnce, { passive: true });
+    window.addEventListener('mousedown', unlockOnce, { passive: true });
+    window.addEventListener('keydown', unlockOnce);
+  }
+
   function playSFX(type) {
     if (settings.sfxVolume === 0) return;
-    
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    ensureAudioUnlocked();
+    if (!audioCtx || audioCtx.state !== 'running') return;
+
+    const ctx = audioCtx;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    
+
     osc.connect(gain);
     gain.connect(ctx.destination);
     gain.gain.value = settings.sfxVolume;
