@@ -1,41 +1,75 @@
-# 🎺 MARIACHI VS INFLATION
+# 🎺 Mariachi vs Inflation
 
-Mini-juego arcade estilo Fruit Ninja sobre inflación y Bitcoin.
+Arcade educativo mobile-first (estilo Fruit Ninja) sobre inflación y cómo **ahorrar/invertir** usando Bitcoin como protección.
 
-## 🎮 Juega ahora
-**https://mariachi-vs-inflation.vercel.app**
+## ▶️ Jugar
+- **Live:** https://mariachi-vs-inflation.vercel.app
 
-## ✨ Features (MVP)
-- ✅ Pantalla de inicio con banner completo
-- ✅ **Asset loading garantizado** (precarga con JavaScript nativo antes de KAPLAY)
-- ✅ Mobile-first (touch + swipe)
-- ⏳ Gameplay en desarrollo
+## 🧠 Qué enseña
+- Inflación como pérdida de poder adquisitivo
+- Bitcoin como activo escaso (oferta fija / halving)
+- Conceptos: HODL, sats, self-custody, nodos, Lightning
 
-## 🏗️ Stack
-- **KAPLAY** (motor de juego)
-- **Vite** (build ultra rápido)
-- **Vanilla JS** (cero frameworks)
+Dentro del juego aparecen **mensajes educativos** (configurables) cada ~15s.
 
-## 🚀 Dev
-```bash
-npm install
-npm run dev      # http://localhost:5173
-npm run build    # dist/
+## 🎮 Mecánicas
+- **Corta inflación** (tortillas, renta, gasolina, etc.) → **+10 pts**
+- Si **se escapa** inflación → **-15 pts** y **-1/3 de vida**
+- **Bitcoin**:
+  - Si lo “guardas” (lo dejas pasar) → **+50 pts**
+  - Si lo cortas → **-1 vida completa**
+  - 3 cortes de BTC → **Game Over (PAPER HANDS)**
+- **Combos**: corta 2+ en un solo tajo → bonus x2/x3/x4
+- **Powerups**:
+  - ⚡ Lightning → x2 puntos
+  - 🟧 Bloque → congela inflación
+  - 🌱 Ahorro → +100 y limpia pantalla
+  - 🔷 Nodo → +1 vida
+
+## 🏆 Leaderboard
+- API serverless en Vercel (`/api/leaderboard`)
+- Base de datos: **Neon Postgres**
+
+Tabla esperada:
+```sql
+CREATE TABLE leaderboard (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(20) NOT NULL,
+  score INT NOT NULL,
+  bitcoins INT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW()
+);
 ```
 
-## 🔧 Asset Loading Architecture
+## 🧰 Stack
+- **Kaplay** (motor)
+- **Vite** (build)
+- **Vanilla JS**
+- **Vercel** (hosting + serverless)
+- **Neon Postgres** (leaderboard)
 
-**Problema resuelto:** Garantizar que TODAS las imágenes carguen antes de inicializar el juego.
+## 🚀 Correr local
+```bash
+npm install
+npm run dev
+```
 
-**Solución implementada:**
-1. **Precarga nativa** con `new Image()` antes de KAPLAY
-2. **Loading screen HTML/CSS** (no depende del motor)
-3. **Promise.all()** espera a que TODOS los assets carguen
-4. **Solo después** → inicializa KAPLAY y usa assets ya en caché
+## 🔐 Variables de entorno
+Crea `.env.local`:
+```bash
+DATABASE_URL="postgresql://..."
+```
 
-**Resultado:** 100% confiable, escalable a 100+ sprites, zero race conditions.
+## 📦 Deploy
+```bash
+vercel --prod
+```
+
+## 🗂️ Assets
+- Inflación: `public/assets/Assets/`
+- Powerups: `public/assets/PowerUps/`
 
 ---
 
-**Built by:** PanteraClaw 🐆  
-**Repo:** https://github.com/panteraclaw/mariachi-vs-inflation
+Built by **PanteraClaw** 🐆  
+Repo: https://github.com/panteraclaw/mariachi-vs-inflation

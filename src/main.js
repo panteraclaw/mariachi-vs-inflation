@@ -247,6 +247,31 @@ function createScenes(k, preloadedAssets) {
     helpBtn.onHover(() => k.setCursor('pointer'));
     helpBtn.onHoverEnd(() => k.setCursor('default'));
 
+    // "Aprende BTC" small, discreet link
+    const learnBtn = k.add([
+      k.rect(170, 38, { radius: 12 }),
+      k.pos(105, 830),
+      k.anchor('center'),
+      k.color(40, 40, 50),
+      k.opacity(0.55),
+      k.outline(2, k.rgb(120, 120, 140)),
+      k.area(),
+      k.z(10),
+    ]);
+
+    k.add([
+      k.text('Aprende BTC', { size: 16 }),
+      k.pos(105, 830),
+      k.anchor('center'),
+      k.color(210, 210, 230),
+      k.opacity(0.9),
+      k.z(11),
+    ]);
+
+    learnBtn.onClick(() => k.go('learnbtc'));
+    learnBtn.onHover(() => k.setCursor('pointer'));
+    learnBtn.onHoverEnd(() => k.setCursor('default'));
+
     // GitHub logo (bottom-right corner)
     const githubBtn = k.add([
       k.sprite('github'),
@@ -447,7 +472,7 @@ function createScenes(k, preloadedAssets) {
       if (page === 0) {
         card('OBJETIVO', [
           'Corta la INFLACIÓN para ahorrar pesos',
-          'Deja pasar BITCOIN para proteger tu ahorro',
+          'GUARDA / INVIERTE en BITCOIN (no lo cortes)',
           'Sobrevive y haz el mayor score posible',
         ], [
           { key: 'tortilla', label: 'Inflación' },
@@ -471,8 +496,8 @@ function createScenes(k, preloadedAssets) {
       }
 
       if (page === 2) {
-        card('BITCOIN (NO LO CORTES)', [
-          '✅ Si lo dejas pasar: +50 pts',
+        card('BITCOIN (AHORRA / INVIERTE)', [
+          '✅ Si lo dejas pasar: +50 pts (ahorraste en BTC)',
           '❌ Si lo cortas: pierdes 1 VIDA COMPLETA',
           '3 cortes de BTC = Game Over (PAPER HANDS)',
         ], [
@@ -541,8 +566,38 @@ function createScenes(k, preloadedAssets) {
       return b;
     };
 
-    // Top center: go back to main menu
-    btnStyle(240, 80, 'MENÚ', () => k.go('menu'));
+    // Close (X) button - top-right
+    const closeShadow = k.add([
+      k.rect(52, 52, { radius: 16 }),
+      k.pos(440, 86),
+      k.anchor('center'),
+      k.color(0, 0, 0),
+      k.opacity(0.28),
+      k.z(9),
+    ]);
+
+    const closeBtn = k.add([
+      k.rect(52, 52, { radius: 16 }),
+      k.pos(440, 80),
+      k.anchor('center'),
+      k.color(255, 104, 60),
+      k.opacity(0.92),
+      k.outline(4, k.rgb(255, 220, 140)),
+      k.area(),
+      k.z(10),
+    ]);
+
+    k.add([
+      k.text('✕', { size: 28 }),
+      k.pos(440, 80),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.z(11),
+    ]);
+
+    closeBtn.onClick(() => k.go('menu'));
+    closeBtn.onHover(() => k.setCursor('pointer'));
+    closeBtn.onHoverEnd(() => k.setCursor('default'));
 
     // Bottom: back/next
     btnStyle(130, 760, 'VOLVER', () => {
@@ -552,6 +607,144 @@ function createScenes(k, preloadedAssets) {
 
     btnStyle(350, 760, 'SIGUIENTE', () => {
       page = (page + 1) % 5;
+      render();
+    });
+
+    render();
+  });
+
+  // ===== LEARN BTC SCENE (read tips) =====
+  k.scene('learnbtc', () => {
+    k.setGravity(0);
+
+    // Background
+    if (bgData) {
+      const scaleX = 480 / bgData.width;
+      const scaleY = 854 / bgData.height;
+      const bgScale = Math.max(scaleX, scaleY);
+
+      k.add([
+        k.sprite(getBg()),
+        k.pos(240, 427),
+        k.anchor('center'),
+        k.scale(bgScale),
+        k.opacity(0.25),
+        k.z(0),
+      ]);
+    }
+
+    k.add([
+      k.rect(460, 760, { radius: 18 }),
+      k.pos(240, 427),
+      k.anchor('center'),
+      k.color(10, 20, 30),
+      k.opacity(0.85),
+      k.z(1),
+    ]);
+
+    k.add([
+      k.text('APRENDE BTC', { size: 32 }),
+      k.pos(240, 150),
+      k.anchor('center'),
+      k.color(255, 220, 140),
+      k.z(2),
+    ]);
+
+    k.add([
+      k.text('Tips cortos (se ven también mientras juegas)', { size: 16, width: 420, align: 'center' }),
+      k.pos(240, 190),
+      k.anchor('center'),
+      k.color(230, 240, 255),
+      k.opacity(0.85),
+      k.z(2),
+    ]);
+
+    let page = 0;
+    const perPage = 8;
+    const totalPages = Math.max(1, Math.ceil(eduTips.length / perPage));
+
+    const tipsText = k.add([
+      k.text('', { size: 18, width: 420, lineSpacing: 10 }),
+      k.pos(240, 420),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.z(2),
+    ]);
+
+    const pageText = k.add([
+      k.text('', { size: 16 }),
+      k.pos(240, 690),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.opacity(0.7),
+      k.z(2),
+    ]);
+
+    const render = () => {
+      const start = page * perPage;
+      const slice = eduTips.slice(start, start + perPage);
+      tipsText.text = slice.map(t => `• ${t}`).join('\n');
+      pageText.text = `${page + 1}/${totalPages}`;
+    };
+
+    // Small button style
+    const smallBtn = (x, y, label, onClick) => {
+      const b = k.add([
+        k.rect(160, 50, { radius: 16 }),
+        k.pos(x, y),
+        k.anchor('center'),
+        k.color(255, 104, 60),
+        k.opacity(0.92),
+        k.outline(4, k.rgb(255, 220, 140)),
+        k.area(),
+        k.z(3),
+      ]);
+
+      k.add([
+        k.text(label, { size: 20 }),
+        k.pos(x, y),
+        k.anchor('center'),
+        k.color(255, 255, 255),
+        k.z(4),
+      ]);
+
+      b.onClick(onClick);
+      b.onHover(() => k.setCursor('pointer'));
+      b.onHoverEnd(() => k.setCursor('default'));
+      return b;
+    };
+
+    // Close (X)
+    const closeBtn = k.add([
+      k.rect(52, 52, { radius: 16 }),
+      k.pos(440, 80),
+      k.anchor('center'),
+      k.color(255, 104, 60),
+      k.opacity(0.92),
+      k.outline(4, k.rgb(255, 220, 140)),
+      k.area(),
+      k.z(5),
+    ]);
+
+    k.add([
+      k.text('✕', { size: 28 }),
+      k.pos(440, 80),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.z(6),
+    ]);
+
+    closeBtn.onClick(() => k.go('menu'));
+    closeBtn.onHover(() => k.setCursor('pointer'));
+    closeBtn.onHoverEnd(() => k.setCursor('default'));
+
+    smallBtn(130, 760, 'VOLVER', () => {
+      page = (page - 1 + totalPages) % totalPages;
+      render();
+    });
+
+    smallBtn(350, 760, 'SIGUIENTE', () => {
+      page = (page + 1) % totalPages;
       render();
     });
 
@@ -1595,11 +1788,42 @@ function createScenes(k, preloadedAssets) {
       return obj;
     }
 
+    function missFX(x) {
+      // Subtle warning effect from bottom when inflation escapes
+      const baseY = 854;
+      const burst = 6;
+
+      for (let i = 0; i < burst; i++) {
+        const w = k.rand(8, 18);
+        const h = k.rand(40, 90);
+        const dx = k.rand(-22, 22);
+        const c = Math.random() < 0.5 ? k.rgb(255, 120, 80) : k.rgb(255, 220, 140);
+
+        const p = k.add([
+          k.rect(w, h, { radius: 4 }),
+          k.pos(x + dx, baseY + 20),
+          k.anchor('center'),
+          k.color(c),
+          k.opacity(0.28),
+          k.z(140),
+          { vy: k.rand(-220, -150), t: 0 },
+        ]);
+
+        p.onUpdate(() => {
+          p.t += k.dt();
+          p.pos.y += p.vy * k.dt();
+          p.opacity = Math.max(0, 0.28 - p.t * 0.35);
+          if (p.t > 0.8) k.destroy(p);
+        });
+      }
+    }
+
     function handleMiss(obj) {
       // Inflation misses are punished
       if (INFLATION_SPRITES.includes(obj.kind)) {
         addScore(-15);
         damageHeartThird();
+        missFX(obj.pos.x);
         return;
       }
 
