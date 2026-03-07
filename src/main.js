@@ -3,56 +3,41 @@ import kaplay from 'kaplay';
 // Assets to preload
 const ASSETS_TO_LOAD = ['/assets/menu-banner.jpg'];
 
-// Preload images with native JavaScript
+// Preload images
 function preloadImages(urls) {
   return Promise.all(
     urls.map(url => {
       return new Promise((resolve, reject) => {
         const img = new Image();
-        img.onload = () => {
-          console.log(`✓ Asset loaded: ${url} (${img.width}x${img.height})`);
-          resolve({ url, width: img.width, height: img.height });
-        };
-        img.onerror = () => {
-          console.error(`✗ Failed to load: ${url}`);
-          reject(new Error(`Failed to load ${url}`));
-        };
+        img.onload = () => resolve({ url, width: img.width, height: img.height });
+        img.onerror = () => reject(new Error(`Failed to load ${url}`));
         img.src = url;
       });
     })
   );
 }
 
-// Loading screen
-const loadingText = document.getElementById('loading-screen');
-if (loadingText) {
-  loadingText.querySelector('#loading-text').textContent = 'Precargando imágenes...';
-}
+// Simple loading (no flash)
+const loadingScreen = document.getElementById('loading-screen');
 
-// Preload THEN initialize
 preloadImages(ASSETS_TO_LOAD)
   .then((loadedAssets) => {
-    console.log('✓ All assets preloaded:', loadedAssets);
-    const textEl = document.getElementById('loading-text');
-    if (textEl) textEl.textContent = '¡Listo! Iniciando juego...';
-    
-    setTimeout(() => {
-      const screen = document.getElementById('loading-screen');
-      if (screen) screen.remove();
-      initGame(loadedAssets);
-    }, 300);
+    // Remove loading screen instantly
+    if (loadingScreen) loadingScreen.remove();
+    initGame(loadedAssets);
   })
   .catch((err) => {
-    console.error('❌ Error preloading assets:', err);
+    console.error('Error loading assets:', err);
     const textEl = document.getElementById('loading-text');
     if (textEl) {
-      textEl.textContent = 'Error cargando assets. Refresca la página.';
+      textEl.textContent = 'Error. Refresca la página.';
       textEl.style.color = '#ff6432';
     }
   });
 
 function initGame(preloadedAssets) {
-  console.log('🎮 Initializing KAPLAY...');
+  // Get real image dimensions from preload
+  const bannerDimensions = preloadedAssets.find(a => a.url.includes('menu-banner'));
   
   const k = kaplay({
     width: 480,
@@ -66,27 +51,20 @@ function initGame(preloadedAssets) {
   });
 
   k.canvas.classList.add('loaded');
-
-  // Load sprites
-  console.log('📦 Loading sprites into KAPLAY...');
   k.loadSprite('menu-banner', '/assets/menu-banner.jpg');
   
-  // Wait for KAPLAY to finish loading sprites
   k.onLoad(() => {
-    console.log('✓ KAPLAY finished loading all sprites');
-    createScenes(k);
+    createScenes(k, bannerDimensions);
     k.go('menu');
-    console.log('✓ Game started');
   });
 }
 
-function createScenes(k) {
+function createScenes(k, bannerDimensions) {
   // ===== MENU SCENE =====
   k.scene('menu', () => {
     k.setGravity(0);
-    console.log('📋 Menu scene started');
 
-    // Background fallback
+    // Background
     k.add([
       k.rect(480, 854),
       k.color(15, 40, 60),
@@ -94,45 +72,30 @@ function createScenes(k) {
       k.z(-1),
     ]);
 
-    // Banner sprite
-    try {
-      const spriteData = k.getSprite('menu-banner');
-      console.log('🖼️ Full sprite object:', spriteData);
-      console.log('🖼️ sprite.data:', spriteData?.data);
-      console.log('🖼️ sprite.loaded:', spriteData?.loaded);
+    // Banner with REAL dimensions
+    if (bannerDimensions) {
+      const realWidth = bannerDimensions.width;
+      const realHeight = bannerDimensions.height;
       
-      // Check if sprite is loaded
-      if (spriteData && spriteData.loaded) {
-        // Get actual dimensions from the data
-        const imgWidth = spriteData.data?.tex?.width || spriteData.width || 853;
-        const imgHeight = spriteData.data?.tex?.height || spriteData.height || 1280;
-        
-        console.log(`✓ Using dimensions: ${imgWidth}x${imgHeight}`);
-        
-        const scaleX = 480 / imgWidth;
-        const scaleY = 854 / imgHeight;
-        const scale = Math.max(scaleX, scaleY);
+      const scaleX = 480 / realWidth;
+      const scaleY = 854 / realHeight;
+      const scale = Math.max(scaleX, scaleY);
 
-        k.add([
-          k.sprite('menu-banner'),
-          k.pos(240, 427),
-          k.anchor('center'),
-          k.scale(scale),
-          k.z(0),
-        ]);
-        
-        console.log('✓ Banner displayed (scale:', scale, ')');
-      } else {
-        console.error('❌ Sprite not loaded');
-      }
-    } catch (err) {
-      console.error('❌ Error displaying banner:', err);
+      k.add([
+        k.sprite('menu-banner'),
+        k.pos(240, 427),
+        k.anchor('center'),
+        k.scale(scale),
+        k.z(0),
+      ]);
+      
+      console.log(`✓ Banner: ${realWidth}x${realHeight}, scale: ${scale}`);
     }
 
-    // JUGAR button
+    // JUGAR button (at bottom, inside banner area)
     const btn = k.add([
       k.rect(240, 70, { radius: 12 }),
-      k.pos(240, 754),
+      k.pos(240, 770), // Moved up to be inside banner
       k.anchor('center'),
       k.color(255, 100, 50),
       k.area(),
@@ -142,7 +105,7 @@ function createScenes(k) {
 
     k.add([
       k.text('JUGAR', { size: 32 }),
-      k.pos(240, 754),
+      k.pos(240, 770),
       k.anchor('center'),
       k.color(255, 255, 255),
       k.z(10),
