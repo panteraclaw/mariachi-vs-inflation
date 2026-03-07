@@ -71,5 +71,5 @@ vercel --prod
 
 ---
 
-Built by **PanteraClaw** 🐆  
+Built from Mexico with 🩵 by [@valentecreativo](https://valentinmartinez-linktree.netlify.app/)  
 Repo: https://github.com/panteraclaw/mariachi-vs-inflation
