@@ -214,6 +214,8 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     helpBtn.onClick(() => k.go('tutorial'));
+    helpBtn.onHover(() => k.setCursor('pointer'));
+    helpBtn.onHoverEnd(() => k.setCursor('default'));
 
     // Mariachi - make him the PROTAGONIST and align him precisely above the button
     if (mariachiData) {
@@ -373,9 +375,10 @@ function createScenes(k, preloadedAssets) {
 
       if (page === 0) {
         card('1) INFLACIÓN (CÓRTALA)', [
-          '+10 si la cortas',
-          '-15 y daño si se te escapa',
-        ], ['tortilla', 'gasolina', 'aguacate']);
+          'Tortillas • Renta • Gasolina',
+          'Canasta Básica • Aguacates',
+          '+10 al cortar | -15 + daño si se escapa',
+        ], ['tortilla', 'renta', 'gasolina', 'canasta', 'aguacate']);
       }
 
       if (page === 1) {
@@ -427,7 +430,7 @@ function createScenes(k, preloadedAssets) {
       return b;
     };
 
-    btnStyle(130, 760, 'VOLVER', () => k.go('menu'));
+    btnStyle(130, 760, 'MENÚ', () => k.go('menu'));
     btnStyle(350, 760, 'SIGUIENTE', () => {
       page = (page + 1) % 3;
       render();
@@ -491,8 +494,8 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     const makeBtn = (label, y, onClick, opts = {}) => {
-      const w = opts.w ?? 300;
-      const h = opts.h ?? 52;
+      const w = opts.w ?? 280;
+      const h = opts.h ?? 46;
       const radius = 16;
 
       // Shadow
@@ -517,8 +520,8 @@ function createScenes(k, preloadedAssets) {
 
       // Highlight
       k.add([
-        k.rect(w - 18, 16, { radius: 10 }),
-        k.pos(240, y - 16),
+        k.rect(w - 18, 14, { radius: 10 }),
+        k.pos(240, y - 14),
         k.anchor('center'),
         k.color(255, 255, 255),
         k.opacity(0.16),
@@ -526,7 +529,7 @@ function createScenes(k, preloadedAssets) {
       ]);
 
       k.add([
-        k.text(label, { size: 22 }),
+        k.text(label, { size: 20 }),
         k.pos(240, y),
         k.anchor('center'),
         k.color(255, 255, 255),
@@ -561,15 +564,41 @@ function createScenes(k, preloadedAssets) {
       window.open('https://www.aureobitcoin.com/es', '_blank');
     });
 
-    // Tap anywhere top-left to return
-    const back = k.add([
-      k.text('← MENÚ', { size: 18 }),
-      k.pos(20, 20),
-      k.color(255, 255, 255),
-      k.area(),
-      k.z(5),
+    // Styled small "Menú" button
+    const menuX = 70;
+    const menuY = 28;
+
+    k.add([
+      k.rect(110, 36, { radius: 12 }),
+      k.pos(menuX, menuY + 4),
+      k.anchor('center'),
+      k.color(0, 0, 0),
+      k.opacity(0.28),
+      k.z(20),
     ]);
+
+    const back = k.add([
+      k.rect(110, 36, { radius: 12 }),
+      k.pos(menuX, menuY),
+      k.anchor('center'),
+      k.color(255, 104, 60),
+      k.opacity(0.92),
+      k.outline(3, k.rgb(255, 220, 140)),
+      k.area(),
+      k.z(21),
+    ]);
+
+    k.add([
+      k.text('MENÚ', { size: 16 }),
+      k.pos(menuX, menuY),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.z(22),
+    ]);
+
     back.onClick(() => k.go('menu'));
+    back.onHover(() => k.setCursor('pointer'));
+    back.onHoverEnd(() => k.setCursor('default'));
   });
 
   // ===== GAME SCENE =====
@@ -726,9 +755,10 @@ function createScenes(k, preloadedAssets) {
       // (Previous: ~0.5. Now: ~0.18-0.22 depending on type)
       const scale = (() => {
         // Reduce ~65% from previous sizes
-        if (sprite === 'bitcoin') return 0.065;
-        if (sprite === 'lightning' || sprite === 'bloque' || sprite === 'ahorro' || sprite === 'nodo') return 0.065;
-        return 0.08; // inflation objects
+        // +5% bump (was slightly too small)
+        if (sprite === 'bitcoin') return 0.068;
+        if (sprite === 'lightning' || sprite === 'bloque' || sprite === 'ahorro' || sprite === 'nodo') return 0.068;
+        return 0.084; // inflation objects
       })();
 
       const obj = k.add([
