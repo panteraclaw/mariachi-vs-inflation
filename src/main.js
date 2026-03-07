@@ -497,10 +497,10 @@ function createScenes(k, preloadedAssets) {
       clearPage();
 
       if (page === 0) {
-        card('OBJETIVO', [
-          'Corta la INFLACIÓN para ahorrar pesos',
-          'GUARDA / INVIERTE en BITCOIN (no lo cortes)',
-          'Sobrevive y haz el mayor score posible',
+        card(t('tutorial_1_title'), [
+          t('tutorial_1_line1'),
+          t('tutorial_1_line2'),
+          t('tutorial_1_line3'),
         ], [
           { key: 'tortilla', label: 'Inflación' },
           { key: 'bitcoin', label: 'Bitcoin' },
@@ -508,11 +508,11 @@ function createScenes(k, preloadedAssets) {
       }
 
       if (page === 1) {
-        card('INFLACIÓN (NEGATIVOS)', [
-          'CORTA: +10 pts',
-          'SI SE ESCAPA: -15 pts + 1/3 de vida',
-          'COMBO: corta 2+ en un solo tajo',
-          '  → x2 +20 | x3 +40 | x4 +80 🔥',
+        card(t('tutorial_2_title'), [
+          t('tutorial_2_line1'),
+          t('tutorial_2_line2'),
+          t('tutorial_2_line3'),
+          t('tutorial_2_line4'),
         ], [
           { key: 'tortilla', label: 'Tortillas' },
           { key: 'renta', label: 'Renta' },
@@ -523,22 +523,22 @@ function createScenes(k, preloadedAssets) {
       }
 
       if (page === 2) {
-        card('BITCOIN (AHORRA / INVIERTE)', [
-          '✅ Si lo dejas pasar: +50 pts (ahorraste en BTC)',
-          '❌ Si lo cortas: pierdes 1 VIDA COMPLETA',
-          '3 cortes de BTC = Game Over (PAPER HANDS)',
+        card(t('tutorial_3_title'), [
+          t('tutorial_3_line1'),
+          t('tutorial_3_line2'),
+          t('tutorial_3_line3'),
         ], [
           { key: 'bitcoin', label: 'Bitcoin' },
         ]);
       }
 
       if (page === 3) {
-        card('POWERUPS', [
-          'Corta estos para activarlos:',
-          '⚡ Lightning: x2 puntos (3s)',
-          '🟧 Bloque: congela inflación (4s)',
-          '🌱 Ahorro: +100 + limpia pantalla',
-          '🔷 Nodo: +1 vida (máx 3)',
+        card(t('tutorial_4_title'), [
+          t('tutorial_4_line1'),
+          t('tutorial_4_line2'),
+          t('tutorial_4_line3'),
+          t('tutorial_4_line4'),
+          t('tutorial_4_line5'),
         ], [
           { key: 'lightning', label: 'x2' },
           { key: 'bloque', label: 'Freeze' },
@@ -548,13 +548,13 @@ function createScenes(k, preloadedAssets) {
       }
 
       if (page === 4) {
-        card('VIDAS + TIPS', [
-          'Tienes 3 vidas: ❤❤❤',
-          '• Inflación escapada: -1/3 de vida',
-          '• Cortar Bitcoin: -1 vida completa',
+        card(t('tutorial_5_title'), [
+          t('tutorial_5_line1'),
+          t('tutorial_5_line2'),
+          t('tutorial_5_line3'),
           '',
-          '💡 Mensajes educativos: aparecen cada 15s',
-          '(puedes apagarlos en ⚙ Configuración)',
+          t('tutorial_5_line6'),
+          t('tutorial_5_line7'),
         ], []);
       }
     }
@@ -627,12 +627,12 @@ function createScenes(k, preloadedAssets) {
     closeBtn.onHoverEnd(() => k.setCursor('default'));
 
     // Bottom: back/next
-    btnStyle(130, 760, 'VOLVER', () => {
+    btnStyle(130, 760, t('tutorial_back'), () => {
       page = (page - 1 + 5) % 5;
       render();
     });
 
-    btnStyle(350, 760, 'SIGUIENTE', () => {
+    btnStyle(350, 760, t('tutorial_next'), () => {
       page = (page + 1) % 5;
       render();
     });
@@ -670,7 +670,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('APRENDE BTC', { size: 32 }),
+      k.text(t('learn_btc_title'), { size: 32 }),
       k.pos(240, 150),
       k.anchor('center'),
       k.color(255, 220, 140),
@@ -678,7 +678,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('Por qué Bitcoin protege tu ahorro (simple y directo)', { size: 16, width: 420, align: 'center' }),
+      k.text(t('learn_btc_subtitle'), { size: 16, width: 420, align: 'center' }),
       k.pos(240, 190),
       k.anchor('center'),
       k.color(230, 240, 255),
@@ -816,12 +816,12 @@ function createScenes(k, preloadedAssets) {
     closeBtn.onHover(() => k.setCursor('pointer'));
     closeBtn.onHoverEnd(() => k.setCursor('default'));
 
-    smallBtn(130, 760, 'VOLVER', () => {
+    smallBtn(130, 760, t('tutorial_back'), () => {
       page = (page - 1 + totalPages) % totalPages;
       render();
     });
 
-    smallBtn(350, 760, 'SIGUIENTE', () => {
+    smallBtn(350, 760, t('tutorial_next'), () => {
       page = (page + 1) % totalPages;
       render();
     });
@@ -861,7 +861,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('GAME OVER', { size: 44 }),
+      k.text(t('gameover_title'), { size: 44 }),
       k.pos(240, 120),
       k.anchor('center'),
       k.color(255, 104, 60),
@@ -919,7 +919,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     const placeholderText = k.add([
-      k.text('Toca para escribir...', { size: 18 }),
+      k.text(t('gameover_input_placeholder'), { size: 18 }),
       k.pos(200, 380),
       k.anchor('center'),
       k.color(120, 130, 150),
@@ -929,7 +929,7 @@ function createScenes(k, preloadedAssets) {
 
     // Small hint on web
     const typeHint = k.add([
-      k.text('⌨ Escribe tu nombre', { size: 14 }),
+      k.text(t('gameover_input_hint'), { size: 14 }),
       k.pos(200, 412),
       k.anchor('center'),
       k.color(255, 220, 140),
@@ -1028,13 +1028,13 @@ function createScenes(k, preloadedAssets) {
         body: JSON.stringify({ name: playerName, score, bitcoins })
       })
         .then(() => {
-          nameDisplay.text = '✓ Guardado!';
+          nameDisplay.text = t('gameover_saved_status');
           nameDisplay.color = k.rgb(120, 220, 160);
           const inp = document.getElementById('oc-name-input');
           if (inp) inp.blur();
         })
         .catch(() => {
-          nameDisplay.text = 'Error';
+          nameDisplay.text = t('gameover_error');
           nameDisplay.color = k.rgb(255, 100, 100);
         });
     };
@@ -1095,9 +1095,9 @@ function createScenes(k, preloadedAssets) {
     };
 
     // Mobile layout (requested order) - smaller buttons, tighter spacing
-    makeBtn('JUGAR OTRA VEZ', 470, () => k.go('game'));
+    makeBtn(t('gameover_play_again'), 470, () => k.go('game'));
 
-    makeBtn('COMPARTIR PUNTUACIÓN', 525, () => {
+    makeBtn(t('gameover_share'), 525, () => {
       const gameUrl = 'https://mariachi-vs-inflation.vercel.app';
       const text = encodeURIComponent(
         `Ahorré $${score} pesos cortando la inflación. BTC guardados: ${bitcoins}. ¿Cuánto podrás ahorrar? ${gameUrl}`
@@ -1106,15 +1106,15 @@ function createScenes(k, preloadedAssets) {
       window.open(url, '_blank');
     }, { w: 300 });
 
-    makeBtn('LEADERBOARD', 580, () => {
+    makeBtn(t('gameover_leaderboard'), 580, () => {
       k.go('leaderboard', { score, bitcoins });
     });
 
-    makeBtn('APRENDE SOBRE INFLACIÓN', 635, () => {
+    makeBtn(t('gameover_learn_inflation'), 635, () => {
       window.open('https://inflacionmexico.com', '_blank');
     }, { w: 300 });
 
-    makeBtn('COMPRA BITCOIN', 690, () => {
+    makeBtn(t('gameover_buy_btc'), 690, () => {
       window.open('https://www.aureobitcoin.com/es', '_blank');
     });
 
@@ -1143,7 +1143,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('MENÚ', { size: 16 }),
+      k.text(t('gameover_menu'), { size: 16 }),
       k.pos(menuX, menuY),
       k.anchor('center'),
       k.color(255, 255, 255),
@@ -1291,7 +1291,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('LEADERBOARD', { size: 36 }),
+      k.text(t('gameover_leaderboard'), { size: 36 }),
       k.pos(240, 100),
       k.anchor('center'),
       k.color(255, 220, 140),
@@ -1401,7 +1401,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('VOLVER', { size: 22 }),
+      k.text(t('tutorial_back'), { size: 22 }),
       k.pos(240, 780),
       k.anchor('center'),
       k.color(255, 255, 255),
@@ -1545,7 +1545,7 @@ function createScenes(k, preloadedAssets) {
       ]));
 
       addPause(k.add([
-        k.text('PAUSA', { size: 32 }),
+        k.text(t('game_pause'), { size: 32 }),
         k.pos(240, 340),
         k.anchor('center'),
         k.color(255, 255, 255),
@@ -1561,7 +1561,7 @@ function createScenes(k, preloadedAssets) {
         k.area(),
         k.z(201),
       ]));
-      addPause(k.add([k.text('CONTINUAR', { size: 22 }), k.pos(240, 420), k.anchor('center'), k.color(255, 255, 255), k.z(202)]));
+      addPause(k.add([k.text(t('game_pause_continue'), { size: 22 }), k.pos(240, 420), k.anchor('center'), k.color(255, 255, 255), k.z(202)]));
 
       continueBtn.onClick(closePause);
       continueBtn.onHover(() => k.setCursor('pointer'));
@@ -1576,7 +1576,7 @@ function createScenes(k, preloadedAssets) {
         k.area(),
         k.z(201),
       ]));
-      addPause(k.add([k.text('ABANDONAR', { size: 22 }), k.pos(240, 490), k.anchor('center'), k.color(255, 255, 255), k.z(202)]));
+      addPause(k.add([k.text(t('game_pause_quit'), { size: 22 }), k.pos(240, 490), k.anchor('center'), k.color(255, 255, 255), k.z(202)]));
 
       quitBtn.onClick(() => {
         closePause();
@@ -1630,7 +1630,7 @@ function createScenes(k, preloadedAssets) {
       ]));
 
       addOverlay(k.add([
-        k.text('CONFIGURACIÓN', { size: 24 }),
+        k.text(t('settings_title'), { size: 24 }),
         k.pos(240, 320),
         k.anchor('center'),
         k.color(255, 255, 255),
@@ -1638,7 +1638,7 @@ function createScenes(k, preloadedAssets) {
       ]));
 
       const volLabel = addOverlay(k.add([
-        k.text(`Volumen SFX: ${Math.round(settings.sfxVolume * 100)}%`, { size: 20 }),
+        k.text(`${t('settings_volume')}: ${Math.round(settings.sfxVolume * 100)}%`, { size: 20 }),
         k.pos(240, 380),
         k.anchor('center'),
         k.color(230, 240, 255),
@@ -1673,18 +1673,18 @@ function createScenes(k, preloadedAssets) {
         k.area(),
         k.z(201),
       ]));
-      addOverlay(k.add([k.text('Mute', { size: 18 }), k.pos(340, 420), k.anchor('center'), k.z(202)]));
+      addOverlay(k.add([k.text(t('settings_mute'), { size: 18 }), k.pos(340, 420), k.anchor('center'), k.z(202)]));
 
       volDown.onClick(() => {
         settings.sfxVolume = Math.max(0, settings.sfxVolume - 0.1);
-        volLabel.text = `Volumen SFX: ${Math.round(settings.sfxVolume * 100)}%`;
+        volLabel.text = `${t('settings_volume')}: ${Math.round(settings.sfxVolume * 100)}%`;
       });
       volDown.onHover(() => k.setCursor('pointer'));
       volDown.onHoverEnd(() => k.setCursor('default'));
 
       volUp.onClick(() => {
         settings.sfxVolume = Math.min(1, settings.sfxVolume + 0.1);
-        volLabel.text = `Volumen SFX: ${Math.round(settings.sfxVolume * 100)}%`;
+        volLabel.text = `${t('settings_volume')}: ${Math.round(settings.sfxVolume * 100)}%`;
       });
       volUp.onHover(() => k.setCursor('pointer'));
       volUp.onHoverEnd(() => k.setCursor('default'));
@@ -1697,7 +1697,7 @@ function createScenes(k, preloadedAssets) {
       muteBtn.onHoverEnd(() => k.setCursor('default'));
 
       const eduLabel = addOverlay(k.add([
-        k.text(`Mensajes educativos: ${settings.eduMessages ? 'ON' : 'OFF'}`, { size: 20 }),
+        k.text(`${t('settings_edu_messages')}: ${settings.eduMessages ? 'ON' : 'OFF'}`, { size: 20 }),
         k.pos(240, 480),
         k.anchor('center'),
         k.color(230, 240, 255),
@@ -1712,11 +1712,11 @@ function createScenes(k, preloadedAssets) {
         k.area(),
         k.z(201),
       ]));
-      addOverlay(k.add([k.text('Toggle', { size: 18 }), k.pos(240, 520), k.anchor('center'), k.z(202)]));
+      addOverlay(k.add([k.text(t('settings_toggle'), { size: 18 }), k.pos(240, 520), k.anchor('center'), k.z(202)]));
 
       toggleEdu.onClick(() => {
         settings.eduMessages = !settings.eduMessages;
-        eduLabel.text = `Mensajes educativos: ${settings.eduMessages ? 'ON' : 'OFF'}`;
+        eduLabel.text = `${t('settings_edu_messages')}: ${settings.eduMessages ? 'ON' : 'OFF'}`;
         toggleEdu.color = settings.eduMessages ? k.rgb(60, 180, 100) : k.rgb(120, 120, 140);
       });
       toggleEdu.onHover(() => k.setCursor('pointer'));
@@ -1730,7 +1730,7 @@ function createScenes(k, preloadedAssets) {
         k.area(),
         k.z(201),
       ]));
-      addOverlay(k.add([k.text('VOLVER', { size: 20 }), k.pos(240, 580), k.anchor('center'), k.z(202)]));
+      addOverlay(k.add([k.text(t('tutorial_back'), { size: 20 }), k.pos(240, 580), k.anchor('center'), k.z(202)]));
 
       closeBtn.onClick(closeOverlay);
       closeBtn.onHover(() => k.setCursor('pointer'));
@@ -1810,8 +1810,8 @@ function createScenes(k, preloadedAssets) {
     });
 
     function refreshUI() {
-      scoreText.text = `Score: ${score}`;
-      btcText.text = `BTC: ${bitcoinCounter}`;
+      scoreText.text = `${t('game_score')}: ${score}`;
+      btcText.text = `${t('game_btc')}: ${bitcoinCounter}`;
 
       // Hearts
       const fullHearts = '❤'.repeat(Math.max(0, hearts));
@@ -1821,7 +1821,7 @@ function createScenes(k, preloadedAssets) {
       // 3-hit meter for current heart (inflation escapes = 1 hit)
       const remaining = Math.max(0, 3 - heartDamage);
       const meter = '▮'.repeat(remaining) + '▯'.repeat(3 - remaining);
-      heartMeterText.text = `Resistencia: ${meter}`;
+      heartMeterText.text = `${t('game_resistance')}: ${meter}`;
     }
 
     refreshUI();
@@ -1998,11 +1998,11 @@ function createScenes(k, preloadedAssets) {
 
         if (bitcoinStreak === 3) {
           addScore(100);
-          toast.show('HODL! x3', k.rgb(255, 220, 140));
+          toast.show(t('toast_hodl_x3'), k.rgb(255, 220, 140));
         }
         if (bitcoinStreak === 5) {
           addScore(200);
-          toast.show('HODL! x5', k.rgb(255, 220, 140));
+          toast.show(t('toast_hodl_x5'), k.rgb(255, 220, 140));
         }
 
         refreshUI();
@@ -2061,13 +2061,13 @@ function createScenes(k, preloadedAssets) {
         playSFX('btc-error');
 
         if (bitcoinCuts >= 3) {
-          toast.show('PAPER HANDS! ☠', k.rgb(255, 180, 120));
+          toast.show(t('toast_paper_hands'), k.rgb(255, 180, 120));
           endGame();
           k.destroy(obj);
           return;
         }
 
-        toast.show('Vendiste tu Bitcoin! (-vida)', k.rgb(255, 180, 120));
+        toast.show(t('toast_btc_cut'), k.rgb(255, 180, 120));
         k.destroy(obj);
         return;
       }
@@ -2076,7 +2076,7 @@ function createScenes(k, preloadedAssets) {
       if (obj.kind === 'lightning') {
         scoreMultiplier = 2;
         multiplierUntil = elapsed + 3;
-        toast.show('DOBLE PUNTOS x2 (3s)', k.rgb(255, 255, 180));
+        toast.show(t('toast_double_points'), k.rgb(255, 255, 180));
         playSFX('powerup');
         k.destroy(obj);
         return;
@@ -2085,7 +2085,7 @@ function createScenes(k, preloadedAssets) {
       if (obj.kind === 'bloque') {
         slowMotion = true;
         slowUntil = elapsed + 4;
-        toast.show('TIME FREEZE (4s)', k.rgb(200, 220, 255));
+        toast.show(t('toast_time_freeze'), k.rgb(200, 220, 255));
         playSFX('powerup');
         k.destroy(obj);
         return;
@@ -2094,7 +2094,7 @@ function createScenes(k, preloadedAssets) {
       if (obj.kind === 'ahorro') {
         addScore(100);
         explodeAhorro();
-        toast.show('AHORRO: LIMPIEZA +100', k.rgb(140, 255, 190));
+        toast.show(t('toast_ahorro'), k.rgb(140, 255, 190));
         playSFX('powerup');
         k.destroy(obj);
         return;
@@ -2104,7 +2104,7 @@ function createScenes(k, preloadedAssets) {
         // Super rare: grants +1 heart (up to 3) and resets current heart damage
         hearts = Math.min(3, hearts + 1);
         heartDamage = 0;
-        toast.show('VIDA EXTRA +1', k.rgb(170, 220, 255));
+        toast.show(t('toast_extra_life'), k.rgb(170, 220, 255));
         playSFX('powerup');
         refreshUI();
         k.destroy(obj);
@@ -2154,17 +2154,17 @@ function createScenes(k, preloadedAssets) {
       const c = inflationCutsThisSwipe;
       if (c === 2) {
         addScore(20);
-        toast.show('🔥 COMBO x2 +20', k.rgb(255, 200, 80));
+        toast.show(t('toast_combo_x2'), k.rgb(255, 200, 80));
         playSFX('combo');
       }
       else if (c === 3) {
         addScore(40);
-        toast.show('🔥🔥 COMBO x3 +40', k.rgb(255, 180, 60));
+        toast.show(t('toast_combo_x3'), k.rgb(255, 180, 60));
         playSFX('combo');
       }
       else if (c >= 4) {
         addScore(80);
-        toast.show('🔥🔥🔥 COMBO x4 +80', k.rgb(255, 160, 40));
+        toast.show(t('toast_combo_x4'), k.rgb(255, 160, 40));
         playSFX('combo');
       }
 
