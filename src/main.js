@@ -24,29 +24,35 @@ function preloadImages(urls) {
 }
 
 // Loading screen
-const loadingText = document.getElementById('loading-text');
-loadingText.textContent = 'Precargando imágenes...';
+const loadingText = document.getElementById('loading-screen');
+if (loadingText) {
+  loadingText.querySelector('#loading-text').textContent = 'Precargando imágenes...';
+}
 
 // Preload THEN initialize
 preloadImages(ASSETS_TO_LOAD)
   .then((loadedAssets) => {
     console.log('✓ All assets preloaded:', loadedAssets);
-    loadingText.textContent = '¡Listo! Iniciando juego...';
+    const textEl = document.getElementById('loading-text');
+    if (textEl) textEl.textContent = '¡Listo! Iniciando juego...';
     
-    // Wait for assets to be fully in cache
     setTimeout(() => {
-      document.getElementById('loading-screen').remove();
+      const screen = document.getElementById('loading-screen');
+      if (screen) screen.remove();
       initGame(loadedAssets);
     }, 300);
   })
   .catch((err) => {
     console.error('❌ Error preloading assets:', err);
-    loadingText.textContent = 'Error cargando assets. Refresca la página.';
-    loadingText.style.color = '#ff6432';
+    const textEl = document.getElementById('loading-text');
+    if (textEl) {
+      textEl.textContent = 'Error cargando assets. Refresca la página.';
+      textEl.style.color = '#ff6432';
+    }
   });
 
 function initGame(preloadedAssets) {
-  console.log('🎮 Initializing game...');
+  console.log('🎮 Initializing KAPLAY...');
   
   const k = kaplay({
     width: 480,
@@ -61,23 +67,24 @@ function initGame(preloadedAssets) {
 
   k.canvas.classList.add('loaded');
 
-  // Load sprites (already in cache)
+  // Load sprites
+  console.log('📦 Loading sprites into KAPLAY...');
   k.loadSprite('menu-banner', '/assets/menu-banner.jpg');
   
-  // Wait a tiny bit for KAPLAY to register sprites
-  setTimeout(() => {
-    console.log('🎨 Creating scenes...');
+  // CRITICAL: Wait for KAPLAY to finish loading sprites
+  k.onLoad(() => {
+    console.log('✓ KAPLAY finished loading all sprites');
     createScenes(k);
     k.go('menu');
     console.log('✓ Game started');
-  }, 100);
+  });
 }
 
 function createScenes(k) {
   // ===== MENU SCENE =====
   k.scene('menu', () => {
     k.setGravity(0);
-    console.log('📋 Menu scene loaded');
+    console.log('📋 Menu scene started');
 
     // Background fallback
     k.add([
@@ -87,16 +94,16 @@ function createScenes(k) {
       k.z(-1),
     ]);
 
-    // Try to load banner sprite
+    // Banner sprite (GUARANTEED to be loaded now)
     const spriteData = k.getSprite('menu-banner');
-    console.log('🖼️ Sprite data:', spriteData ? `${spriteData.width}x${spriteData.height}` : 'NOT FOUND');
+    console.log('🖼️ Sprite data:', spriteData);
 
     if (spriteData && spriteData.width > 0) {
       const scaleX = 480 / spriteData.width;
       const scaleY = 854 / spriteData.height;
       const scale = Math.max(scaleX, scaleY);
 
-      const banner = k.add([
+      k.add([
         k.sprite('menu-banner'),
         k.pos(240, 427),
         k.anchor('center'),
@@ -104,9 +111,9 @@ function createScenes(k) {
         k.z(0),
       ]);
       
-      console.log('✓ Banner displayed at scale:', scale);
+      console.log('✓ Banner displayed (scale:', scale, ')');
     } else {
-      console.warn('⚠️ Banner sprite not ready');
+      console.error('❌ Banner sprite STILL not ready after onLoad');
     }
 
     // JUGAR button
@@ -128,16 +135,11 @@ function createScenes(k) {
       k.z(10),
     ]);
 
-    btn.onClick(() => {
-      console.log('🎮 Going to game scene');
-      k.go('game');
-    });
-    
+    btn.onClick(() => k.go('game'));
     btn.onHover(() => {
       btn.color = k.rgb(255, 120, 70);
       k.setCursor('pointer');
     });
-    
     btn.onHoverEnd(() => {
       btn.color = k.rgb(255, 100, 50);
       k.setCursor('default');
@@ -146,10 +148,9 @@ function createScenes(k) {
     k.onClick(() => k.go('game'));
   });
 
-  // ===== GAME SCENE (placeholder) =====
+  // ===== GAME SCENE =====
   k.scene('game', () => {
     k.setGravity(400);
-    console.log('🎮 Game scene loaded');
 
     k.add([
       k.rect(480, 854),
@@ -158,7 +159,7 @@ function createScenes(k) {
     ]);
 
     k.add([
-      k.text('GAMEPLAY AQUÍ\n\n(Click para volver al menú)', {
+      k.text('GAMEPLAY AQUÍ\n\n(Click para volver)', {
         size: 24,
         align: 'center',
         width: 400,
@@ -168,9 +169,6 @@ function createScenes(k) {
       k.color(255, 255, 255),
     ]);
 
-    k.onClick(() => {
-      console.log('🔙 Going back to menu');
-      k.go('menu');
-    });
+    k.onClick(() => k.go('menu'));
   });
 }
