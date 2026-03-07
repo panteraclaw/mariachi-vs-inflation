@@ -1,4 +1,5 @@
 import kaplay from 'kaplay';
+import { i18n, eduTips as i18nEduTips } from './i18n.js';
 
 // Assets to preload
 const ASSETS_TO_LOAD = [
@@ -157,6 +158,32 @@ function createScenes(k, preloadedAssets) {
     nightBtn.onHover(() => k.setCursor('pointer'));
     nightBtn.onHoverEnd(() => k.setCursor('default'));
 
+    // Language toggle button (top-left)
+    const langBtn = k.add([
+      k.rect(70, 50, { radius: 25 }),
+      k.pos(50, 30),
+      k.anchor('center'),
+      k.color(100, 100, 120),
+      k.outline(2, k.rgb(180, 180, 200)),
+      k.area(),
+      k.z(100),
+    ]);
+
+    k.add([
+      k.text(settings.language === 'es' ? 'ES' : 'EN', { size: 20 }),
+      k.pos(50, 30),
+      k.anchor('center'),
+      k.color(255, 255, 255),
+      k.z(101),
+    ]);
+
+    langBtn.onClick(() => {
+      settings.language = settings.language === 'es' ? 'en' : 'es';
+      k.go('menu');
+    });
+    langBtn.onHover(() => k.setCursor('pointer'));
+    langBtn.onHoverEnd(() => k.setCursor('default'));
+
     // Logo - top center
     if (logoData) {
       // Scale logo a bit bigger (80% of screen width)
@@ -236,7 +263,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('APRENDE A JUGAR', { size: 18 }),
+      k.text(t('menu_tutorial'), { size: 18 }),
       k.pos(240, helpBtnY),
       k.anchor('center'),
       k.color(255, 255, 255),
@@ -260,7 +287,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('Aprende BTC', { size: 14 }),
+      k.text(t('menu_learn_btc'), { size: 14 }),
       k.pos(95, 830),
       k.anchor('center'),
       k.color(255, 255, 255),
@@ -313,7 +340,7 @@ function createScenes(k, preloadedAssets) {
 
     // Text with subtle shadow
     k.add([
-      k.text('JUGAR', { size: 34 }),
+      k.text(t('menu_play'), { size: 34 }),
       k.pos(242, btnY + 2),
       k.anchor('center'),
       k.color(0, 0, 0),
@@ -322,7 +349,7 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text('JUGAR', { size: 34 }),
+      k.text(t('menu_play'), { size: 34 }),
       k.pos(240, btnY),
       k.anchor('center'),
       k.color(255, 255, 255),
@@ -1133,7 +1160,17 @@ function createScenes(k, preloadedAssets) {
     sfxVolume: 0.3,
     eduMessages: true,
     nightMode: false,
+    language: 'es', // 'es' | 'en'
   };
+
+  // Translation helper
+  const t = (key) => {
+    const value = i18n[settings.language][key];
+    return typeof value === 'function' ? value : (value || key);
+  };
+
+  // Get translated edu tips
+  const getEduTips = () => i18nEduTips[settings.language];
 
   // WebAudio needs a user gesture to play on mobile (iOS/Android)
   let audioCtx = null;
@@ -1220,62 +1257,7 @@ function createScenes(k, preloadedAssets) {
     }
   }
 
-  const eduTips = [
-    // Core
-    'BTC: suministro fijo de 21M',
-    'Bitcoin es desinflacionario (oferta fija)',
-    'Inflación reduce tu poder adquisitivo',
-    'Inflación = impuesto invisible',
-    'Tu dinero fiat pierde valor con inflación',
-    'BTC no puede ser impreso por gobiernos',
-    'Descentralización = independencia monetaria',
-    'Halving: la emisión se reduce a la mitad',
-    'Cada ~4 años: halving de BTC',
-    'BTC es oro digital (escaso)',
-
-    // HODL / comportamiento
-    'HODL = mantener BTC largo plazo',
-    'Vender por miedo = paper hands',
-    'Bitcoin premia la paciencia',
-    'DCA: comprar poco a poco reduce riesgo',
-
-    // Seguridad / self-custody
-    'Not your keys, not your coins',
-    'Hardware wallet = custodia propia',
-    'Semilla (seed) = acceso a tu wallet',
-    'Nunca compartas tu seed phrase',
-
-    // Conceptos
-    'Sats: 1 BTC = 100,000,000 sats',
-    'Block time: ~10 min por bloque',
-    'Minería asegura la red con energía',
-    'Nodos validan reglas (nadie manda)',
-    'Oferta fija + demanda = presión alcista',
-
-    // México / vida diaria
-    'En México, inflación anual suele 4-5%',
-    'Precios suben: renta, gasolina, comida',
-    'Ahorro en fiat se devalúa con el tiempo',
-
-    // Juego
-    'Corta inflación, no cortes BTC',
-    'Deja pasar BTC: +50 pts',
-    'Cortar BTC: pierdes 1 vida completa',
-    'Inflación que se escapa: 1/3 de vida',
-    'Powerups ayudan a sobrevivir más',
-
-    // Extra variety
-    'Bitcoin es global: internet + claves',
-    'Transacciones: verificables y públicas',
-    'Comisiones suben cuando hay congestión',
-    'Lightning: pagos rápidos y baratos',
-    'Escasez programada: nadie la cambia fácil',
-    'Fiat: oferta tiende a expandirse',
-    'Ahorra en activo escaso, no en deuda',
-    'Tiempo > timing: piensa a largo plazo',
-    'Volatilidad: precio se mueve, oferta no',
-    'Educación financiera = defensa vs inflación',
-  ];
+  // eduTips now comes from i18n (language-aware)
 
   // ===== LEADERBOARD SCENE =====
   k.scene('leaderboard', (data) => {
@@ -1769,10 +1751,10 @@ function createScenes(k, preloadedAssets) {
       return arr;
     };
 
-    let eduBag = shuffle([...eduTips]);
+    let eduBag = shuffle([...getEduTips()]);
     let lastEduTip = null;
     const nextEduTip = () => {
-      if (eduBag.length === 0) eduBag = shuffle([...eduTips]);
+      if (eduBag.length === 0) eduBag = shuffle([...getEduTips()]);
       let tip = eduBag.pop();
 
       // Avoid immediate repetition when possible
