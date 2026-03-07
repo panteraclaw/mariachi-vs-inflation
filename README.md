@@ -71,5 +71,5 @@ vercel --prod
 
 ---
 
-Built from Mexico with 🩵 by [@valentecreativo](https://github.com/valentecreativo) con assistance de [Panteraclaw](https://github.com/panteraclaw)  
+Built from Mexico with 🩵 by [ValeCreativo](https://github.com/valentecreativo) & [Pantera](https://github.com/panteraclaw) 🐆 (AI cofounder)  
 🔗 https://valentinmartinez-linktree.netlify.app/
