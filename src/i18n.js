@@ -3,6 +3,8 @@ export const i18n = {
   es: {
     // Menu
     menu_play: 'JUGAR',
+    menu_continue: 'CONTINUAR',
+    menu_new_game: 'NUEVO JUEGO',
     menu_tutorial: 'APRENDE A JUGAR',
     menu_learn_btc: 'Aprende BTC',
     
@@ -141,6 +143,8 @@ export const i18n = {
   en: {
     // Menu
     menu_play: 'PLAY',
+    menu_continue: 'CONTINUE',
+    menu_new_game: 'NEW GAME',
     menu_tutorial: 'HOW TO PLAY',
     menu_learn_btc: 'Learn BTC',
     

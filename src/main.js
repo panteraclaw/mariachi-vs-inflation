@@ -198,8 +198,11 @@ function createScenes(k, preloadedAssets) {
       ]);
     }
 
-    // JUGAR button
-    const btnY = 770;
+    // Check for saved game state
+    const hasSavedGame = !!localStorage.getItem('mariachi-game-state');
+
+    // JUGAR button (or CONTINUAR if saved game exists)
+    const btnY = hasSavedGame ? 690 : 770;
     const btnH = 70;
     const btnTopY = btnY - btnH / 2;
 
@@ -339,8 +342,10 @@ function createScenes(k, preloadedAssets) {
     }
 
     // Text with subtle shadow
+    const btnText = hasSavedGame ? t('menu_continue') : t('menu_play');
+    
     k.add([
-      k.text(t('menu_play'), { size: 34 }),
+      k.text(btnText, { size: 34 }),
       k.pos(242, btnY + 2),
       k.anchor('center'),
       k.color(0, 0, 0),
@@ -349,14 +354,28 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     k.add([
-      k.text(t('menu_play'), { size: 34 }),
+      k.text(btnText, { size: 34 }),
       k.pos(240, btnY),
       k.anchor('center'),
       k.color(255, 255, 255),
       k.z(13),
     ]);
 
-    btn.onClick(() => k.go('game'));
+    btn.onClick(() => {
+      if (hasSavedGame) {
+        // Load saved state and continue
+        try {
+          const saved = JSON.parse(localStorage.getItem('mariachi-game-state'));
+          k.go('game', { restore: saved });
+        } catch (err) {
+          console.error('Failed to restore game:', err);
+          localStorage.removeItem('mariachi-game-state');
+          k.go('game');
+        }
+      } else {
+        k.go('game');
+      }
+    });
     btn.onHover(() => {
       btn.color = k.rgb(255, 130, 85);
       k.setCursor('pointer');
@@ -365,6 +384,46 @@ function createScenes(k, preloadedAssets) {
       btn.color = k.rgb(255, 104, 60);
       k.setCursor('default');
     });
+
+    // "NUEVO JUEGO" button (only if saved game exists)
+    if (hasSavedGame) {
+      const newGameBtnY = 770;
+      
+      k.add([
+        k.rect(240, 52, { radius: 16 }),
+        k.pos(240, newGameBtnY + 6),
+        k.anchor('center'),
+        k.color(0, 0, 0),
+        k.opacity(0.28),
+        k.z(8),
+      ]);
+
+      const newGameBtn = k.add([
+        k.rect(240, 52, { radius: 16 }),
+        k.pos(240, newGameBtnY),
+        k.anchor('center'),
+        k.color(100, 120, 140),
+        k.opacity(0.92),
+        k.outline(4, k.rgb(180, 200, 220)),
+        k.area(),
+        k.z(10),
+      ]);
+
+      k.add([
+        k.text(t('menu_new_game'), { size: 18 }),
+        k.pos(240, newGameBtnY),
+        k.anchor('center'),
+        k.color(255, 255, 255),
+        k.z(11),
+      ]);
+
+      newGameBtn.onClick(() => {
+        localStorage.removeItem('mariachi-game-state');
+        k.go('game');
+      });
+      newGameBtn.onHover(() => k.setCursor('pointer'));
+      newGameBtn.onHoverEnd(() => k.setCursor('default'));
+    }
   });
 
   // ===== TUTORIAL SCENE =====
@@ -1399,7 +1458,7 @@ function createScenes(k, preloadedAssets) {
   });
 
   // ===== GAME SCENE =====
-  k.scene('game', () => {
+  k.scene('game', (data) => {
     k.setGravity(0);
 
     // Background
@@ -1419,13 +1478,15 @@ function createScenes(k, preloadedAssets) {
       k.add([k.rect(480, 854), k.color(15, 40, 60), k.pos(0, 0)]);
     }
 
-    // --- State ---
-    let score = 0;
-    let bitcoinCounter = 0;
-    let bitcoinStreak = 0;
+    // --- State (restore from saved game if available) ---
+    const restore = data?.restore;
+    
+    let score = restore?.score || 0;
+    let bitcoinCounter = restore?.bitcoinCounter || 0;
+    let bitcoinStreak = restore?.bitcoinStreak || 0;
 
-    let hearts = 3;
-    let heartDamage = 0; // 0..2 (3rd hit consumes heart)
+    let hearts = restore?.hearts || 3;
+    let heartDamage = restore?.heartDamage || 0; // 0..2 (3rd hit consumes heart)
 
     let scoreMultiplier = 1;
     let multiplierUntil = 0;
@@ -1433,7 +1494,7 @@ function createScenes(k, preloadedAssets) {
     let slowMotion = false;
     let slowUntil = 0;
 
-    let elapsed = 0;
+    let elapsed = restore?.elapsed || 0;
 
     // Swipe / combo state
     let swiping = false;
@@ -1441,7 +1502,7 @@ function createScenes(k, preloadedAssets) {
     let inflationCutsThisSwipe = 0;
 
     // If you cut 3 BTC, you lose ("paper hands")
-    let bitcoinCuts = 0;
+    let bitcoinCuts = restore?.bitcoinCuts || 0;
 
     // --- UI ---
     // HUD background panel for visibility
@@ -1726,6 +1787,46 @@ function createScenes(k, preloadedAssets) {
     settingsBtn.onHover(() => k.setCursor('pointer'));
     settingsBtn.onHoverEnd(() => k.setCursor('default'));
 
+    // Auto-pause when user leaves the tab/app
+    let gameActive = true;
+    
+    const saveGameState = () => {
+      try {
+        const state = {
+          score,
+          bitcoinCounter,
+          bitcoinStreak,
+          hearts,
+          heartDamage,
+          bitcoinCuts,
+          elapsed,
+          timestamp: Date.now(),
+        };
+        localStorage.setItem('mariachi-game-state', JSON.stringify(state));
+      } catch (err) {
+        console.warn('Failed to save game state:', err);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden && gameActive && !paused) {
+        // User left the tab - auto pause and save
+        paused = true;
+        saveGameState();
+        showPauseOverlay();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup on scene end
+    k.onSceneLeave(() => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      gameActive = false;
+      // Clear saved state when game ends normally
+      localStorage.removeItem('mariachi-game-state');
+    });
+
     // Educational messages timer
     let eduTimer = 0;
 
@@ -1847,6 +1948,8 @@ function createScenes(k, preloadedAssets) {
     }
 
     function endGame() {
+      // Clear saved state when game ends
+      localStorage.removeItem('mariachi-game-state');
       k.go('gameover', {
         score: Math.max(0, score),
         bitcoins: bitcoinCounter,
