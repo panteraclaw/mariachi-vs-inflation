@@ -432,7 +432,7 @@ function createScenes(k, preloadedAssets) {
       ]));
 
       addObj(k.add([
-        k.text(`${page + 1}/4`, { size: 18 }),
+        k.text(`${page + 1}/5`, { size: 18 }),
         k.pos(240, 640),
         k.anchor('center'),
         k.color(255, 255, 255),
@@ -445,10 +445,10 @@ function createScenes(k, preloadedAssets) {
       clearPage();
 
       if (page === 0) {
-        card('OBJETIVO DEL JUEGO', [
-          'Corta INFLACIÓN (tortillas, renta, gasolina)',
-          'NO cortes BITCOIN (+50 pts si pasa)',
-          'Sobrevive el mayor tiempo posible',
+        card('OBJETIVO', [
+          'Corta la INFLACIÓN para ahorrar pesos',
+          'Deja pasar BITCOIN para proteger tu ahorro',
+          'Sobrevive y haz el mayor score posible',
         ], [
           { key: 'tortilla', label: 'Inflación' },
           { key: 'bitcoin', label: 'Bitcoin' },
@@ -456,42 +456,53 @@ function createScenes(k, preloadedAssets) {
       }
 
       if (page === 1) {
-        card('ENEMIGOS: INFLACIÓN', [
+        card('INFLACIÓN (NEGATIVOS)', [
           'CORTA: +10 pts',
-          'SE ESCAPA: -15 pts + daño',
-          'COMBO: corta 2+ en un tajo',
+          'SI SE ESCAPA: -15 pts + 1/3 de vida',
+          'COMBO: corta 2+ en un solo tajo',
           '  → x2 +20 | x3 +40 | x4 +80 🔥',
         ], [
+          { key: 'tortilla', label: 'Tortillas' },
           { key: 'renta', label: 'Renta' },
           { key: 'gasolina', label: 'Gasolina' },
+          { key: 'canasta', label: 'Canasta' },
           { key: 'aguacate', label: 'Aguacate' },
         ]);
       }
 
       if (page === 2) {
-        card('BITCOIN Y POWERUPS', [
-          '🪙 BITCOIN: ¡NO CORTAR! +50 si pasa',
-          '  Cortarlo 3 veces = Game Over',
-          '⚡ Lightning: x2 puntos (5s)',
-          '🟧 Bloque: congela inflación (3s)',
-          '🌱 Ahorro: +100 + limpia pantalla',
-          '🔷 Nodo: +1 vida (máx 3)',
+        card('BITCOIN (NO LO CORTES)', [
+          '✅ Si lo dejas pasar: +50 pts',
+          '❌ Si lo cortas: pierdes 1 VIDA COMPLETA',
+          '3 cortes de BTC = Game Over (PAPER HANDS)',
         ], [
           { key: 'bitcoin', label: 'Bitcoin' },
-          { key: 'lightning', label: 'x2 pts' },
-          { key: 'ahorro', label: '+100' },
         ]);
       }
 
       if (page === 3) {
-        card('SISTEMA DE VIDAS', [
-          '❤❤❤ ❤❤❤ ❤❤❤ = 3 vidas (9 golpes)',
-          'Cada vida aguanta 3 golpes',
-          'DAÑO por: inflación escapada o cortar BTC',
-          '0 vidas = Game Over',
+        card('POWERUPS', [
+          'Corta estos para activarlos:',
+          '⚡ Lightning: x2 puntos (3s)',
+          '🟧 Bloque: congela inflación (4s)',
+          '🌱 Ahorro: +100 + limpia pantalla',
+          '🔷 Nodo: +1 vida (máx 3)',
+        ], [
+          { key: 'lightning', label: 'x2' },
+          { key: 'bloque', label: 'Freeze' },
+          { key: 'ahorro', label: '+100' },
+          { key: 'nodo', label: '+Vida' },
+        ]);
+      }
+
+      if (page === 4) {
+        card('VIDAS + TIPS', [
+          'Tienes 3 vidas: ❤❤❤',
+          '• Inflación escapada: -1/3 de vida',
+          '• Cortar Bitcoin: -1 vida completa',
           '',
-          '💡 TIPS EDUCATIVOS: recibirás mensajes',
-          'cada 15s sobre Bitcoin e inflación',
+          '💡 Mensajes educativos: aparecen cada 15s',
+          '(puedes apagarlos en ⚙ Configuración)',
         ], []);
       }
     }
@@ -530,9 +541,17 @@ function createScenes(k, preloadedAssets) {
       return b;
     };
 
-    btnStyle(130, 760, 'MENÚ', () => k.go('menu'));
+    // Top center: go back to main menu
+    btnStyle(240, 80, 'MENÚ', () => k.go('menu'));
+
+    // Bottom: back/next
+    btnStyle(130, 760, 'VOLVER', () => {
+      page = (page - 1 + 5) % 5;
+      render();
+    });
+
     btnStyle(350, 760, 'SIGUIENTE', () => {
-      page = (page + 1) % 4;
+      page = (page + 1) % 5;
       render();
     });
 
@@ -859,26 +878,60 @@ function createScenes(k, preloadedAssets) {
   }
 
   const eduTips = [
+    // Core
     'BTC: suministro fijo de 21M',
+    'Bitcoin es desinflacionario (oferta fija)',
     'Inflación reduce tu poder adquisitivo',
-    'Bitcoin es desinflacionario',
-    'Cada 4 años: halving de BTC',
-    'HODL = mantener BTC largo plazo',
-    'Protege tu ahorro de la devaluación',
-    'BTC es refugio vs inflación',
-    'Tu dinero pierde valor con inflación',
-    'México: inflación promedio 4-5% anual',
+    'Inflación = impuesto invisible',
+    'Tu dinero fiat pierde valor con inflación',
     'BTC no puede ser impreso por gobiernos',
     'Descentralización = independencia monetaria',
-    'Solo 21M BTC existirán jamás',
-    'Inflación castiga a los ahorradores',
+    'Halving: la emisión se reduce a la mitad',
+    'Cada ~4 años: halving de BTC',
+    'BTC es oro digital (escaso)',
+
+    // HODL / comportamiento
+    'HODL = mantener BTC largo plazo',
+    'Vender por miedo = paper hands',
     'Bitcoin premia la paciencia',
-    'Fiat pierde valor, BTC lo preserva',
-    'Halving reduce emisión a la mitad',
-    'BTC es oro digital escaso',
-    'Inflación: impuesto invisible',
-    'Corta la inflación, guarda BTC',
-    'HODL > vender por miedo',
+    'DCA: comprar poco a poco reduce riesgo',
+
+    // Seguridad / self-custody
+    'Not your keys, not your coins',
+    'Hardware wallet = custodia propia',
+    'Semilla (seed) = acceso a tu wallet',
+    'Nunca compartas tu seed phrase',
+
+    // Conceptos
+    'Sats: 1 BTC = 100,000,000 sats',
+    'Block time: ~10 min por bloque',
+    'Minería asegura la red con energía',
+    'Nodos validan reglas (nadie manda)',
+    'Oferta fija + demanda = presión alcista',
+
+    // México / vida diaria
+    'En México, inflación anual suele 4-5%',
+    'Precios suben: renta, gasolina, comida',
+    'Ahorro en fiat se devalúa con el tiempo',
+
+    // Juego
+    'Corta inflación, no cortes BTC',
+    'Deja pasar BTC: +50 pts',
+    'Cortar BTC: pierdes 1 vida completa',
+    'Inflación que se escapa: 1/3 de vida',
+    'Powerups ayudan a sobrevivir más',
+
+    // Extra variety
+    'Bitcoin es global: internet + claves',
+    'Transacciones: verificables y públicas',
+    'Comisiones suben cuando hay congestión',
+    'Lightning: pagos rápidos y baratos',
+    'Escasez programada: nadie la cambia fácil',
+    'Fiat: oferta tiende a expandirse',
+    'Ahorra en activo escaso, no en deuda',
+    'Tiempo > timing: piensa a largo plazo',
+    'Volatilidad: precio se mueve, oferta no',
+    'Educación financiera = defensa vs inflación',
   ];
 
   // ===== LEADERBOARD SCENE =====
@@ -1102,11 +1155,19 @@ function createScenes(k, preloadedAssets) {
       k.z(100),
     ]);
 
-    // Visual health bar (9 mini-hearts = 3 lives x 3 hits each)
-    const healthBar = k.add([
-      k.text('', { size: 18 }),
+    // Health UI: 3 hearts + 3-hit meter (clearer than 9 mini-hearts)
+    const heartsText = k.add([
+      k.text('❤❤❤', { size: 22 }),
       k.pos(18, 74),
       k.color(255, 120, 120),
+      k.z(100),
+    ]);
+
+    const heartMeterText = k.add([
+      k.text('', { size: 16 }),
+      k.pos(18, 98),
+      k.color(255, 220, 140),
+      k.opacity(0.9),
       k.z(100),
     ]);
 
@@ -1356,6 +1417,32 @@ function createScenes(k, preloadedAssets) {
     // Educational messages timer
     let eduTimer = 0;
 
+    // Non-repeating educational tips (shuffle bag)
+    const shuffle = (arr) => {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    };
+
+    let eduBag = shuffle([...eduTips]);
+    let lastEduTip = null;
+    const nextEduTip = () => {
+      if (eduBag.length === 0) eduBag = shuffle([...eduTips]);
+      let tip = eduBag.pop();
+
+      // Avoid immediate repetition when possible
+      if (tip === lastEduTip && eduBag.length > 0) {
+        const alt = eduBag.pop();
+        eduBag.push(tip);
+        tip = alt;
+      }
+
+      lastEduTip = tip;
+      return tip;
+    };
+
     // Toast with background for visibility (larger for edu messages)
     const toastBg = k.add([
       k.rect(440, 70, { radius: 12 }),
@@ -1401,24 +1488,15 @@ function createScenes(k, preloadedAssets) {
       scoreText.text = `Score: ${score}`;
       btcText.text = `BTC: ${bitcoinCounter}`;
 
-      // Visual health: 9 mini-hearts (3 per life, current life shows damage)
-      const totalMiniHearts = hearts * 3 - heartDamage;
-      const maxMiniHearts = 9;
-      
-      let healthDisplay = '';
-      for (let i = 0; i < maxMiniHearts; i++) {
-        if (i < totalMiniHearts) {
-          healthDisplay += '❤';
-        } else {
-          healthDisplay += '🖤';
-        }
-        // Add space every 3 hearts for grouping
-        if ((i + 1) % 3 === 0 && i < maxMiniHearts - 1) {
-          healthDisplay += ' ';
-        }
-      }
-      
-      healthBar.text = healthDisplay;
+      // Hearts
+      const fullHearts = '❤'.repeat(Math.max(0, hearts));
+      const emptyHearts = '🖤'.repeat(Math.max(0, 3 - hearts));
+      heartsText.text = `${fullHearts}${emptyHearts}`;
+
+      // 3-hit meter for current heart (inflation escapes = 1 hit)
+      const remaining = Math.max(0, 3 - heartDamage);
+      const meter = '▮'.repeat(remaining) + '▯'.repeat(3 - remaining);
+      heartMeterText.text = `Resistencia: ${meter}`;
     }
 
     refreshUI();
@@ -1437,12 +1515,21 @@ function createScenes(k, preloadedAssets) {
       refreshUI();
     }
 
-    function damageHeart() {
+    function damageHeartThird() {
+      // Used when inflation escapes: 1/3 of a heart
       heartDamage += 1;
       if (heartDamage >= 3) {
         heartDamage = 0;
         hearts -= 1;
       }
+      refreshUI();
+      if (hearts <= 0) endGame();
+    }
+
+    function damageFullHeart() {
+      // Used when cutting Bitcoin: lose 1 full heart immediately
+      hearts -= 1;
+      heartDamage = 0;
       refreshUI();
       if (hearts <= 0) endGame();
     }
@@ -1512,7 +1599,7 @@ function createScenes(k, preloadedAssets) {
       // Inflation misses are punished
       if (INFLATION_SPRITES.includes(obj.kind)) {
         addScore(-15);
-        damageHeart();
+        damageHeartThird();
         return;
       }
 
@@ -1579,11 +1666,11 @@ function createScenes(k, preloadedAssets) {
 
       // Bitcoin cut (bad)
       if (obj.kind === 'bitcoin') {
-        // Cutting BTC is bad: costs points + health; 3 cuts = instant death
+        // Cutting BTC is bad: costs points + FULL heart; 3 cuts = instant death
         addScore(-30);
         bitcoinStreak = 0;
         bitcoinCuts += 1;
-        damageHeart();
+        damageFullHeart();
         playSFX('btc-error');
 
         if (bitcoinCuts >= 3) {
@@ -1749,11 +1836,10 @@ function createScenes(k, preloadedAssets) {
       elapsed += dt;
       eduTimer += dt;
 
-      // Educational messages every 25 seconds
+      // Educational messages (more frequent + non-repeating)
       if (settings.eduMessages && eduTimer > 15) {
         eduTimer = 0;
-        const tip = eduTips[Math.floor(Math.random() * eduTips.length)];
-        toast.show(tip, k.rgb(255, 220, 140));
+        toast.show(nextEduTip(), k.rgb(255, 220, 140));
       }
 
       // expire powerups
