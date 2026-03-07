@@ -75,6 +75,7 @@ function initGame(preloadedAssets) {
   k.loadSprite('background-night', '/assets/background-night.png');
   k.loadSprite('logo', '/assets/logo.png');
   k.loadSprite('mariachi', '/assets/mariachi.png');
+  k.loadSprite('github', '/assets/github-logo.svg');
 
   // Gameplay sprites
   k.loadSprite('tortilla', '/assets/Assets/Tortilla.png');
@@ -246,23 +247,14 @@ function createScenes(k, preloadedAssets) {
     helpBtn.onHover(() => k.setCursor('pointer'));
     helpBtn.onHoverEnd(() => k.setCursor('default'));
 
-    // GitHub logo (bottom-right corner, small)
+    // GitHub logo (bottom-right corner)
     const githubBtn = k.add([
-      k.circle(22),
+      k.sprite('github'),
       k.pos(450, 830),
       k.anchor('center'),
-      k.color(40, 40, 50),
-      k.opacity(0.85),
-      k.outline(2, k.rgb(120, 120, 140)),
+      k.scale(0.35),
       k.area(),
       k.z(10),
-    ]);
-
-    k.add([
-      k.text('🐙', { size: 28 }),
-      k.pos(450, 830),
-      k.anchor('center'),
-      k.z(11),
     ]);
 
     githubBtn.onClick(() => {
@@ -397,46 +389,50 @@ function createScenes(k, preloadedAssets) {
         k.z(3),
       ]));
 
-      // Icons in two rows if > 3
-      const perRow = items.length > 3 ? 3 : items.length;
-      const rows = Math.ceil(items.length / perRow);
+      // Icons in two rows if > 3 (safe when items is empty)
+      const perRow = items.length > 3 ? 3 : Math.max(1, items.length);
+      const rows = items.length === 0 ? 0 : Math.ceil(items.length / perRow);
 
-      items.forEach((item, i) => {
-        const row = Math.floor(i / perRow);
-        const col = i % perRow;
-        const startX = 240 - (perRow - 1) * 50;
-        const x = startX + col * 100;
-        const y = 340 + row * 90;
+      if (items.length > 0) {
+        items.forEach((item, i) => {
+          const row = Math.floor(i / perRow);
+          const col = i % perRow;
+          const startX = 240 - (perRow - 1) * 50;
+          const x = startX + col * 100;
+          const y = 330 + row * 95;
 
-        addObj(k.add([
-          k.sprite(item.key),
-          k.pos(x, y),
-          k.anchor('center'),
-          k.scale(0.08),
-          k.z(3),
-        ]));
-
-        if (item.label) {
           addObj(k.add([
-            k.text(item.label, { size: 13 }),
-            k.pos(x, y + 38),
+            k.sprite(item.key),
+            k.pos(x, y),
             k.anchor('center'),
-            k.color(200, 210, 230),
+            k.scale(0.08),
             k.z(3),
           ]));
-        }
-      });
 
+          if (item.label) {
+            addObj(k.add([
+              k.text(item.label, { size: 13 }),
+              k.pos(x, y + 42),
+              k.anchor('center'),
+              k.color(200, 210, 230),
+              k.z(3),
+            ]));
+          }
+        });
+      }
+
+      // Body text sits below icon grid (or near top if no icons)
+      const bodyY = items.length === 0 ? 420 : (330 + rows * 95 + 70);
       addObj(k.add([
-        k.text(lines.join('\n'), { size: 16, width: 380, lineSpacing: 8, align: 'center' }),
-        k.pos(240, 340 + rows * 90 + 80),
+        k.text(lines.join('\n'), { size: 16, width: 400, lineSpacing: 9, align: 'center' }),
+        k.pos(240, bodyY),
         k.anchor('center'),
         k.color(230, 240, 255),
         k.z(3),
       ]));
 
       addObj(k.add([
-        k.text(`${page + 1}/3`, { size: 18 }),
+        k.text(`${page + 1}/4`, { size: 18 }),
         k.pos(240, 640),
         k.anchor('center'),
         k.color(255, 255, 255),
@@ -449,36 +445,54 @@ function createScenes(k, preloadedAssets) {
       clearPage();
 
       if (page === 0) {
-        card('1) INFLACIÓN (CÓRTALA)', [
-          '+10 al cortar | -15 + daño si se escapa',
-          'COMBO: corta 2+ en un tajo (x2 +20, x3 +40, x4 +80)',
+        card('OBJETIVO DEL JUEGO', [
+          'Corta INFLACIÓN (tortillas, renta, gasolina)',
+          'NO cortes BITCOIN (+50 pts si pasa)',
+          'Sobrevive el mayor tiempo posible',
         ], [
-          { key: 'tortilla', label: 'Tortillas' },
-          { key: 'renta', label: 'Renta' },
-          { key: 'gasolina', label: 'Gasolina' },
-          { key: 'canasta', label: 'Canasta' },
-          { key: 'aguacate', label: 'Aguacates' },
+          { key: 'tortilla', label: 'Inflación' },
+          { key: 'bitcoin', label: 'Bitcoin' },
         ]);
       }
 
       if (page === 1) {
-        card('2) POWERUPS', [
-          'Corta estos para activarlos',
+        card('ENEMIGOS: INFLACIÓN', [
+          'CORTA: +10 pts',
+          'SE ESCAPA: -15 pts + daño',
+          'COMBO: corta 2+ en un tajo',
+          '  → x2 +20 | x3 +40 | x4 +80 🔥',
         ], [
-          { key: 'lightning', label: '⚡ x2 pts' },
-          { key: 'bloque', label: '🟧 Freeze' },
-          { key: 'nodo', label: '🔷 +Vida' },
+          { key: 'renta', label: 'Renta' },
+          { key: 'gasolina', label: 'Gasolina' },
+          { key: 'aguacate', label: 'Aguacate' },
         ]);
       }
 
       if (page === 2) {
-        card('3) BITCOIN & AHORRO', [
-          'BITCOIN: no lo cortes (+50 si pasa)',
-          'AHORRO: +100 y limpia inflación',
+        card('BITCOIN Y POWERUPS', [
+          '🪙 BITCOIN: ¡NO CORTAR! +50 si pasa',
+          '  Cortarlo 3 veces = Game Over',
+          '⚡ Lightning: x2 puntos (5s)',
+          '🟧 Bloque: congela inflación (3s)',
+          '🌱 Ahorro: +100 + limpia pantalla',
+          '🔷 Nodo: +1 vida (máx 3)',
         ], [
           { key: 'bitcoin', label: 'Bitcoin' },
-          { key: 'ahorro', label: 'Ahorro' },
+          { key: 'lightning', label: 'x2 pts' },
+          { key: 'ahorro', label: '+100' },
         ]);
+      }
+
+      if (page === 3) {
+        card('SISTEMA DE VIDAS', [
+          '❤❤❤ ❤❤❤ ❤❤❤ = 3 vidas (9 golpes)',
+          'Cada vida aguanta 3 golpes',
+          'DAÑO por: inflación escapada o cortar BTC',
+          '0 vidas = Game Over',
+          '',
+          '💡 TIPS EDUCATIVOS: recibirás mensajes',
+          'cada 15s sobre Bitcoin e inflación',
+        ], []);
       }
     }
 
@@ -518,7 +532,7 @@ function createScenes(k, preloadedAssets) {
 
     btnStyle(130, 760, 'MENÚ', () => k.go('menu'));
     btnStyle(350, 760, 'SIGUIENTE', () => {
-      page = (page + 1) % 3;
+      page = (page + 1) % 4;
       render();
     });
 
@@ -1736,7 +1750,7 @@ function createScenes(k, preloadedAssets) {
       eduTimer += dt;
 
       // Educational messages every 25 seconds
-      if (settings.eduMessages && eduTimer > 25) {
+      if (settings.eduMessages && eduTimer > 15) {
         eduTimer = 0;
         const tip = eduTips[Math.floor(Math.random() * eduTips.length)];
         toast.show(tip, k.rgb(255, 220, 140));
