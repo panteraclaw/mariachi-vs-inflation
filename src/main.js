@@ -1,7 +1,11 @@
 import kaplay from 'kaplay';
 
 // Assets to preload
-const ASSETS_TO_LOAD = ['/assets/menu-banner.jpg'];
+const ASSETS_TO_LOAD = [
+  '/assets/background.jpg',
+  '/assets/logo.jpg',
+  '/assets/mariachi.jpg'
+];
 
 // Preload images
 function preloadImages(urls) {
@@ -17,11 +21,11 @@ function preloadImages(urls) {
   );
 }
 
-// Loading screen (only show if loading takes time)
+// Loading screen (only show if slow)
 const loadingScreen = document.getElementById('loading-screen');
 let loadingTimeout = setTimeout(() => {
   if (loadingScreen) loadingScreen.classList.add('show');
-}, 200); // Only show if loading takes more than 200ms
+}, 200);
 
 preloadImages(ASSETS_TO_LOAD)
   .then((loadedAssets) => {
@@ -41,8 +45,6 @@ preloadImages(ASSETS_TO_LOAD)
   });
 
 function initGame(preloadedAssets) {
-  const bannerDimensions = preloadedAssets.find(a => a.url.includes('menu-banner'));
-  
   const k = kaplay({
     width: 480,
     height: 854,
@@ -55,20 +57,29 @@ function initGame(preloadedAssets) {
   });
 
   k.canvas.classList.add('loaded');
-  k.loadSprite('menu-banner', '/assets/menu-banner.jpg');
+  
+  // Load all sprites
+  k.loadSprite('background', '/assets/background.jpg');
+  k.loadSprite('logo', '/assets/logo.jpg');
+  k.loadSprite('mariachi', '/assets/mariachi.jpg');
   
   k.onLoad(() => {
-    createScenes(k, bannerDimensions);
+    createScenes(k, preloadedAssets);
     k.go('menu');
   });
 }
 
-function createScenes(k, bannerDimensions) {
+function createScenes(k, preloadedAssets) {
+  // Get real dimensions
+  const bgData = preloadedAssets.find(a => a.url.includes('background'));
+  const logoData = preloadedAssets.find(a => a.url.includes('logo'));
+  const mariachiData = preloadedAssets.find(a => a.url.includes('mariachi'));
+
   // ===== MENU SCENE =====
   k.scene('menu', () => {
     k.setGravity(0);
 
-    // Background
+    // Background fallback
     k.add([
       k.rect(480, 854),
       k.color(15, 40, 60),
@@ -76,21 +87,49 @@ function createScenes(k, bannerDimensions) {
       k.z(-1),
     ]);
 
-    // Banner
-    if (bannerDimensions) {
-      const realWidth = bannerDimensions.width;
-      const realHeight = bannerDimensions.height;
-      
-      const scaleX = 480 / realWidth;
-      const scaleY = 854 / realHeight;
-      const scale = Math.max(scaleX, scaleY);
+    // Background (pueblito) - cover full screen
+    if (bgData) {
+      const scaleX = 480 / bgData.width;
+      const scaleY = 854 / bgData.height;
+      const bgScale = Math.max(scaleX, scaleY);
 
       k.add([
-        k.sprite('menu-banner'),
+        k.sprite('background'),
         k.pos(240, 427),
         k.anchor('center'),
-        k.scale(scale),
+        k.scale(bgScale),
         k.z(0),
+      ]);
+    }
+
+    // Logo - top center
+    if (logoData) {
+      // Scale logo to 70% of screen width
+      const logoScale = (480 * 0.7) / logoData.width;
+      
+      k.add([
+        k.sprite('logo'),
+        k.pos(240, 180),
+        k.anchor('center'),
+        k.scale(logoScale),
+        k.z(2),
+      ]);
+    }
+
+    // Mariachi - above button
+    if (mariachiData) {
+      // Scale mariachi to fit nicely (max 300px tall)
+      const mariachiScale = Math.min(
+        (480 * 0.5) / mariachiData.width,
+        250 / mariachiData.height
+      );
+      
+      k.add([
+        k.sprite('mariachi'),
+        k.pos(240, 600),
+        k.anchor('center'),
+        k.scale(mariachiScale),
+        k.z(3),
       ]);
     }
 
@@ -113,14 +152,11 @@ function createScenes(k, bannerDimensions) {
       k.z(10),
     ]);
 
-    // ONLY button activates game (removed global onClick)
     btn.onClick(() => k.go('game'));
-    
     btn.onHover(() => {
       btn.color = k.rgb(255, 120, 70);
       k.setCursor('pointer');
     });
-    
     btn.onHoverEnd(() => {
       btn.color = k.rgb(255, 100, 50);
       k.setCursor('default');
