@@ -1444,6 +1444,15 @@ function createScenes(k, preloadedAssets) {
     let bitcoinCuts = 0;
 
     // --- UI ---
+    // HUD background panel for visibility
+    k.add([
+      k.rect(200, 130, { radius: 12 }),
+      k.pos(10, 10),
+      k.color(0, 0, 0),
+      k.opacity(0.7),
+      k.z(99),
+    ]);
+
     const scoreText = k.add([
       k.text(`${t('game_score')}: 0`, { size: 22 }),
       k.pos(18, 18),
