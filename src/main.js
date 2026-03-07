@@ -128,33 +128,42 @@ function createScenes(k, preloadedAssets) {
       ]);
     }
 
-    // Mariachi - make him the PROTAGONIST (bigger + lower)
-    if (mariachiData) {
-      // Prefer width-based scale, cap by height so it doesn't cover the logo.
-      const mariachiScale = Math.min(
-        (480 * 0.75) / mariachiData.width, // ~75% of screen width
-        420 / mariachiData.height          // cap height around 420px
-      );
-
-      k.add([
-        k.sprite('mariachi'),
-        k.pos(240, 610), // lifted so feet don't overlap the JUGAR button
-        k.anchor('center'),
-        k.scale(mariachiScale),
-        k.z(3),
-      ]);
-    }
-
     // JUGAR button
+    const btnY = 770;
+    const btnH = 70;
+    const btnTopY = btnY - btnH / 2;
+
     const btn = k.add([
-      k.rect(240, 70, { radius: 12 }),
-      k.pos(240, 770),
+      k.rect(240, btnH, { radius: 12 }),
+      k.pos(240, btnY),
       k.anchor('center'),
       k.color(255, 100, 50),
       k.area(),
       k.z(10),
       'btn',
     ]);
+
+    // Mariachi - make him the PROTAGONIST and align him precisely above the button
+    if (mariachiData) {
+      // Make him bigger
+      const mariachiScale = Math.min(
+        (480 * 0.82) / mariachiData.width, // ~82% of screen width
+        480 / mariachiData.height          // cap height around 480px
+      );
+
+      // We want the bottom edge of the sprite to be 2px above the button top
+      const desiredBottomY = btnTopY - 2;
+      const mariachiHeightPx = mariachiData.height * mariachiScale;
+      const mariachiY = desiredBottomY - mariachiHeightPx / 2;
+
+      k.add([
+        k.sprite('mariachi'),
+        k.pos(240, mariachiY),
+        k.anchor('center'),
+        k.scale(mariachiScale),
+        k.z(3),
+      ]);
+    }
 
     k.add([
       k.text('JUGAR', { size: 32 }),
