@@ -246,6 +246,32 @@ function createScenes(k, preloadedAssets) {
     helpBtn.onHover(() => k.setCursor('pointer'));
     helpBtn.onHoverEnd(() => k.setCursor('default'));
 
+    // GitHub link button (bottom-center, small)
+    const githubBtn = k.add([
+      k.rect(160, 38, { radius: 12 }),
+      k.pos(240, 830),
+      k.anchor('center'),
+      k.color(40, 40, 50),
+      k.opacity(0.85),
+      k.outline(2, k.rgb(120, 120, 140)),
+      k.area(),
+      k.z(10),
+    ]);
+
+    k.add([
+      k.text('</> Código', { size: 16 }),
+      k.pos(240, 830),
+      k.anchor('center'),
+      k.color(200, 200, 220),
+      k.z(11),
+    ]);
+
+    githubBtn.onClick(() => {
+      window.open('https://github.com/panteraclaw/mariachi-vs-inflation', '_blank');
+    });
+    githubBtn.onHover(() => k.setCursor('pointer'));
+    githubBtn.onHoverEnd(() => k.setCursor('default'));
+
     // Mariachi - make him the PROTAGONIST and align him precisely above the button
     if (mariachiData) {
       // Make him bigger
@@ -426,6 +452,7 @@ function createScenes(k, preloadedAssets) {
       if (page === 0) {
         card('1) INFLACIÓN (CÓRTALA)', [
           '+10 al cortar | -15 + daño si se escapa',
+          'COMBO: corta 2+ en un tajo (x2 +20, x3 +40, x4 +80)',
         ], [
           { key: 'tortilla', label: 'Tortillas' },
           { key: 'renta', label: 'Renta' },
@@ -566,8 +593,8 @@ function createScenes(k, preloadedAssets) {
     let saved = false;
 
     const nameBox = k.add([
-      k.rect(260, 42, { radius: 12 }),
-      k.pos(240, 380),
+      k.rect(280, 42, { radius: 12 }),
+      k.pos(200, 380),
       k.anchor('center'),
       k.color(40, 50, 70),
       k.outline(2, k.rgb(150, 160, 180)),
@@ -576,7 +603,7 @@ function createScenes(k, preloadedAssets) {
 
     const nameDisplay = k.add([
       k.text('', { size: 20 }),
-      k.pos(240, 380),
+      k.pos(200, 380),
       k.anchor('center'),
       k.color(230, 240, 255),
       k.z(3),
@@ -584,7 +611,7 @@ function createScenes(k, preloadedAssets) {
 
     const placeholderText = k.add([
       k.text('Escribe tu nombre...', { size: 18 }),
-      k.pos(240, 380),
+      k.pos(200, 380),
       k.anchor('center'),
       k.color(120, 130, 150),
       k.opacity(0.6),
@@ -609,10 +636,10 @@ function createScenes(k, preloadedAssets) {
       }
     });
 
-    // Save button (floppy disk icon)
+    // Save button (floppy disk icon) - positioned to the right of input
     const saveBtn = k.add([
       k.rect(50, 42, { radius: 12 }),
-      k.pos(310, 380),
+      k.pos(370, 380),
       k.anchor('center'),
       k.color(60, 180, 100),
       k.outline(2, k.rgb(120, 220, 160)),
@@ -622,7 +649,7 @@ function createScenes(k, preloadedAssets) {
 
     k.add([
       k.text('💾', { size: 26 }),
-      k.pos(310, 380),
+      k.pos(370, 380),
       k.anchor('center'),
       k.z(3),
     ]);
@@ -781,23 +808,23 @@ function createScenes(k, preloadedAssets) {
     gain.gain.value = settings.sfxVolume;
 
     if (type === 'slice') {
-      // Sword slash: sharp whoosh sound
-      osc.type = 'square';
-      osc.frequency.value = 600;
-      osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.09);
+      // Deep sword whoosh: grave y suave
+      osc.type = 'sine';
+      osc.frequency.value = 180;
+      osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.11);
       
       const filter = ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.value = 800;
-      filter.Q.value = 2;
+      filter.type = 'lowpass';
+      filter.frequency.value = 400;
+      filter.Q.value = 1;
       
       osc.connect(filter);
       filter.connect(gain);
       
-      gain.gain.value = settings.sfxVolume * 0.5;
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.09);
+      gain.gain.value = settings.sfxVolume * 0.4;
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.11);
       osc.start();
-      osc.stop(ctx.currentTime + 0.09);
+      osc.stop(ctx.currentTime + 0.11);
     } else if (type === 'btc-error') {
       osc.frequency.value = 200;
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
@@ -824,9 +851,21 @@ function createScenes(k, preloadedAssets) {
     'Bitcoin es desinflacionario',
     'Cada 4 años: halving de BTC',
     'HODL = mantener BTC largo plazo',
-    'Protege tu ahorro',
+    'Protege tu ahorro de la devaluación',
     'BTC es refugio vs inflación',
     'Tu dinero pierde valor con inflación',
+    'México: inflación promedio 4-5% anual',
+    'BTC no puede ser impreso por gobiernos',
+    'Descentralización = independencia monetaria',
+    'Solo 21M BTC existirán jamás',
+    'Inflación castiga a los ahorradores',
+    'Bitcoin premia la paciencia',
+    'Fiat pierde valor, BTC lo preserva',
+    'Halving reduce emisión a la mitad',
+    'BTC es oro digital escaso',
+    'Inflación: impuesto invisible',
+    'Corta la inflación, guarda BTC',
+    'HODL > vender por miedo',
   ];
 
   // ===== LEADERBOARD SCENE =====
@@ -978,7 +1017,14 @@ function createScenes(k, preloadedAssets) {
       k.z(4),
     ]);
 
-    backBtn.onClick(() => k.go('menu'));
+    backBtn.onClick(() => {
+      // If came from gameover (has score), go back to gameover
+      if (myScore !== undefined) {
+        k.go('gameover', { score: myScore, bitcoins: myBitcoins });
+      } else {
+        k.go('menu');
+      }
+    });
     backBtn.onHover(() => k.setCursor('pointer'));
     backBtn.onHoverEnd(() => k.setCursor('default'));
   });
@@ -1070,10 +1116,74 @@ function createScenes(k, preloadedAssets) {
     ]);
 
     pauseBtn.onClick(() => {
-      paused = !paused;
       if (paused) {
-        toast.show('PAUSA', k.rgb(200, 200, 200));
+        // Already paused, unpause
+        paused = false;
+        return;
       }
+
+      paused = true;
+      const pauseObjs = [];
+
+      const addPause = (obj) => {
+        pauseObjs.push(obj);
+        return obj;
+      };
+
+      const closePause = () => {
+        pauseObjs.forEach(o => k.destroy(o));
+        paused = false;
+      };
+
+      addPause(k.add([
+        k.rect(360, 260, { radius: 18 }),
+        k.pos(240, 427),
+        k.anchor('center'),
+        k.color(20, 30, 44),
+        k.opacity(0.95),
+        k.z(200),
+      ]));
+
+      addPause(k.add([
+        k.text('PAUSA', { size: 32 }),
+        k.pos(240, 340),
+        k.anchor('center'),
+        k.color(255, 255, 255),
+        k.z(201),
+      ]));
+
+      const continueBtn = addPause(k.add([
+        k.rect(240, 52, { radius: 14 }),
+        k.pos(240, 420),
+        k.anchor('center'),
+        k.color(60, 180, 100),
+        k.outline(3, k.rgb(120, 220, 160)),
+        k.area(),
+        k.z(201),
+      ]));
+      addPause(k.add([k.text('CONTINUAR', { size: 22 }), k.pos(240, 420), k.anchor('center'), k.color(255, 255, 255), k.z(202)]));
+
+      continueBtn.onClick(closePause);
+      continueBtn.onHover(() => k.setCursor('pointer'));
+      continueBtn.onHoverEnd(() => k.setCursor('default'));
+
+      const quitBtn = addPause(k.add([
+        k.rect(240, 52, { radius: 14 }),
+        k.pos(240, 490),
+        k.anchor('center'),
+        k.color(180, 80, 80),
+        k.outline(3, k.rgb(220, 120, 120)),
+        k.area(),
+        k.z(201),
+      ]));
+      addPause(k.add([k.text('ABANDONAR', { size: 22 }), k.pos(240, 490), k.anchor('center'), k.color(255, 255, 255), k.z(202)]));
+
+      quitBtn.onClick(() => {
+        closePause();
+        endGame();
+      });
+      quitBtn.onHover(() => k.setCursor('pointer'));
+      quitBtn.onHoverEnd(() => k.setCursor('default'));
     });
     pauseBtn.onHover(() => k.setCursor('pointer'));
     pauseBtn.onHoverEnd(() => k.setCursor('default'));
@@ -1541,17 +1651,17 @@ function createScenes(k, preloadedAssets) {
       const c = inflationCutsThisSwipe;
       if (c === 2) {
         addScore(20);
-        toast.show('COMBO x2 +20', k.rgb(255, 255, 255));
+        toast.show('🔥 COMBO x2 +20', k.rgb(255, 200, 80));
         playSFX('combo');
       }
       else if (c === 3) {
         addScore(40);
-        toast.show('COMBO x3 +40', k.rgb(255, 255, 255));
+        toast.show('🔥🔥 COMBO x3 +40', k.rgb(255, 180, 60));
         playSFX('combo');
       }
       else if (c >= 4) {
         addScore(80);
-        toast.show('COMBO x4 +80', k.rgb(255, 255, 255));
+        toast.show('🔥🔥🔥 COMBO x4 +80', k.rgb(255, 160, 40));
         playSFX('combo');
       }
 
@@ -1572,21 +1682,24 @@ function createScenes(k, preloadedAssets) {
         const len = Math.sqrt(dx * dx + dy * dy);
 
         if (len > 1) {
-          // Interpolate points every 8px to ensure continuity
-          const steps = Math.ceil(len / 8);
+          // Pointy slash: small rotated rectangles
+          const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+          const steps = Math.ceil(len / 6);
+          
           for (let i = 0; i <= steps; i++) {
             const t = i / steps;
             const ix = ax + dx * t;
             const iy = ay + dy * t;
 
             k.add([
-              k.circle(6),
+              k.rect(12, 3, { radius: 1 }),
               k.pos(ix, iy),
               k.anchor('center'),
+              k.rotate(angle),
               k.color(0, 0, 0),
-              k.opacity(0.45),
+              k.opacity(0.5),
               k.z(150),
-              k.lifespan(0.12, { fade: 0.06 }),
+              k.lifespan(0.10, { fade: 0.05 }),
             ]);
           }
         }
