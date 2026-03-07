@@ -49,11 +49,21 @@ function initGame(preloadedAssets) {
     width: 480,
     height: 854,
     background: [15, 40, 60],
-    scale: Math.min(window.innerWidth / 480, window.innerHeight / 854),
+
+    // Let KAPLAY handle sizing with letterbox. We focus on high DPI instead of manual scale.
+    // Manual fractional scale is a common cause of blur on mobile.
     letterbox: true,
-    // IMPORTANT: crisp=true makes canvas use pixelated rendering (retro look).
-    // For this game we want smooth / high-quality scaling.
+
+    // Render at higher internal resolution on mobile screens.
+    // Cap at 2 to avoid melting GPUs.
+    pixelDensity: Math.min(window.devicePixelRatio || 1, 2),
+
+    // Smooth scaling (no retro pixelation)
     crisp: false,
+
+    // Smooth texture sampling for sprites
+    texFilter: "linear",
+
     touchToMouse: true,
     debug: false,
   });
