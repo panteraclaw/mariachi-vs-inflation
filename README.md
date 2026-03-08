@@ -1,16 +1,18 @@
 # 🎺 Mariachi vs Inflation
 
-Arcade educativo mobile-first (estilo Fruit Ninja) sobre inflación y cómo **ahorrar/invertir** usando Bitcoin como protección.
+Arcade educativo mobile-first (estilo Fruit Ninja) sobre el cambio del sistema monetario y **Bitcoin como infraestructura descentralizada** para protegerse de la crisis.
 
 ## ▶️ Jugar
 - **Live:** https://mariachi-vs-inflation.vercel.app
 
 ## 🧠 Qué enseña
-- Inflación como pérdida de poder adquisitivo
-- Bitcoin como activo escaso (oferta fija / halving)
-- Conceptos: HODL, sats, self-custody, nodos, Lightning
+- El sistema monetario está cambiando (dólar pierde respaldo, geopolítica se fractura)
+- **Bitcoin es dinero**, no inversión especulativa ni token atado al dólar
+- Infraestructura descentralizada: **protección matemática** ante la crisis
+- Coordinación ciudadana global sin intermediarios (red abierta de nodos)
+- Preparación colectiva ante el colapso del sistema Westphaliano
 
-Dentro del juego aparecen **mensajes educativos** (configurables) cada ~15s.
+Dentro del juego aparecen **mensajes de consciencia** (configurables) cada ~15s para despertar, no alarmar.
 
 ## 🎮 Mecánicas
 - **Corta inflación** (tortillas, renta, gasolina, etc.) → **+10 pts**

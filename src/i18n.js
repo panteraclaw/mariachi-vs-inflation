@@ -75,7 +75,7 @@ export const i18n = {
     learn_2_body: 'El dinero tradicional depende de promesas. Bancos, gobiernos, intermediarios que pueden fallar.\n\nCuando el sistema se agota, ¿dónde va tu trabajo? ¿Dónde guardas décadas de esfuerzo?\n\nLa pregunta ya no es "si" cambia, sino "cómo nos preparamos".',
     
     learn_3_title: '3) Bitcoin como arca tecnológica',
-    learn_3_body: 'Bitcoin no es para "invertir". Es infraestructura para el cambio monetario.\n\nFunciona sin promesas, solo con matemática y código abierto. Nadie lo controla. Todos lo verificamos.\n\nEs refugio técnico ante lo que viene. No es especulación. Es preparación.',
+    learn_3_body: 'Bitcoin ES DINERO. No inversión, no token atado al dólar.\n\nEs protección matemática ante la crisis. Funciona sin promesas, solo con código abierto verificable.\n\nNadie lo controla. Todos lo verificamos. Es infraestructura para el cambio monetario que ya comenzó.\n\nNo es especulación. Es preparación.',
     
     learn_4_title: '4) Cómo funciona (red abierta)',
     learn_4_body: 'Miles de nodos verifican transacciones. Nadie da órdenes. Las reglas son código.\n\nNo pides permiso para usar Bitcoin. No depende de un gobierno o corporación.\n\nEs coordinación ciudadana global. Construida por todos, para todos.',
@@ -221,7 +221,7 @@ export const i18n = {
     learn_2_body: 'Traditional money depends on promises. Banks, governments, intermediaries that can fail.\n\nWhen the system exhausts, where does your work go? Where do you keep decades of effort?\n\nThe question is no longer "if" it changes, but "how we prepare".',
     
     learn_3_title: '3) Bitcoin as technological ark',
-    learn_3_body: 'Bitcoin is not for "investing". It is infrastructure for monetary change.\n\nIt works without promises, only with mathematics and open code. No one controls it. We all verify it.\n\nIt is technical shelter for what comes. Not speculation. Preparation.',
+    learn_3_body: 'Bitcoin IS MONEY. Not investment, not a token tied to the dollar.\n\nIt is mathematical protection against the crisis. It works without promises, only with verifiable open code.\n\nNo one controls it. We all verify it. It is infrastructure for the monetary change that already began.\n\nNot speculation. Preparation.',
     
     learn_4_title: '4) How it works (open network)',
     learn_4_body: 'Thousands of nodes verify transactions. No one gives orders. The rules are code.\n\nYou don\'t ask permission to use Bitcoin. It doesn\'t depend on a government or corporation.\n\nIt is global citizen coordination. Built by all, for all.',
