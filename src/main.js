@@ -947,7 +947,6 @@ function createScenes(k, preloadedAssets) {
       t('gameover_saved')(score),
       '',
       `En Bitcoin: ${btcFormatted} BTC`,
-      `(a precio actual: $${BTC_PRICE_MXN.toLocaleString('es-MX')} MXN)`,
     ].join('\n');
 
     k.add([
