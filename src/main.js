@@ -1931,18 +1931,36 @@ function createScenes(k, preloadedAssets) {
 
     const toast = {
       _t: 0,
-      show(msg, color = k.rgb(255, 255, 255)) {
+      _isCombo: false,
+      show(msg, color = k.rgb(255, 255, 255), isCombo = false) {
         toastText.text = msg;
         toastText.color = color;
         toastText.opacity = 1;
         toastBg.opacity = 0.72;
         this._t = 0;
+        this._isCombo = isCombo;
+        
+        // Combo gets bigger text + pulse animation
+        if (isCombo) {
+          toastText.textSize = 32;
+          toastText.scale = k.vec2(1.3, 1.3);
+        } else {
+          toastText.textSize = 20;
+          toastText.scale = k.vec2(1, 1);
+        }
       }
     };
 
     k.onUpdate(() => {
       if (toastText.opacity > 0) {
         toast._t += k.dt();
+        
+        // Combo pulse animation
+        if (toast._isCombo && toast._t < 0.5) {
+          const pulse = 1.3 + Math.sin(toast._t * 15) * 0.1;
+          toastText.scale = k.vec2(pulse, pulse);
+        }
+        
         if (toast._t > 1.2) {
           const fade = Math.max(0, toastText.opacity - 2 * k.dt());
           toastText.opacity = fade;
@@ -2298,18 +2316,55 @@ function createScenes(k, preloadedAssets) {
       const c = inflationCutsThisSwipe;
       if (c === 2) {
         addScore(20);
-        toast.show(t('toast_combo_x2'), k.rgb(255, 200, 80));
+        toast.show(t('toast_combo_x2'), k.rgb(255, 200, 80), true);
         playSFX('combo');
+        // Particle burst for combo
+        for (let i = 0; i < 15; i++) {
+          k.add([
+            k.rect(8, 8),
+            k.pos(240, 140),
+            k.anchor('center'),
+            k.color(255, 200, 80),
+            k.opacity(1),
+            k.move(k.rand(0, 360), k.rand(100, 300)),
+            k.lifespan(0.6, { fade: 0.3 }),
+            k.z(200),
+          ]);
+        }
       }
       else if (c === 3) {
         addScore(40);
-        toast.show(t('toast_combo_x3'), k.rgb(255, 180, 60));
+        toast.show(t('toast_combo_x3'), k.rgb(255, 180, 60), true);
         playSFX('combo');
+        for (let i = 0; i < 20; i++) {
+          k.add([
+            k.rect(10, 10),
+            k.pos(240, 140),
+            k.anchor('center'),
+            k.color(255, 180, 60),
+            k.opacity(1),
+            k.move(k.rand(0, 360), k.rand(120, 350)),
+            k.lifespan(0.7, { fade: 0.3 }),
+            k.z(200),
+          ]);
+        }
       }
       else if (c >= 4) {
         addScore(80);
-        toast.show(t('toast_combo_x4'), k.rgb(255, 160, 40));
+        toast.show(t('toast_combo_x4'), k.rgb(255, 160, 40), true);
         playSFX('combo');
+        for (let i = 0; i < 30; i++) {
+          k.add([
+            k.rect(12, 12),
+            k.pos(240, 140),
+            k.anchor('center'),
+            k.color(255, 160, 40),
+            k.opacity(1),
+            k.move(k.rand(0, 360), k.rand(150, 400)),
+            k.lifespan(0.8, { fade: 0.3 }),
+            k.z(200),
+          ]);
+        }
       }
 
       inflationCutsThisSwipe = 0;
@@ -2319,6 +2374,116 @@ function createScenes(k, preloadedAssets) {
     k.onMouseMove(() => {
       if (!swiping) return;
       const p = k.mousePos();
+
+      if (lastPos) {
+        // Slice trail: continuous line via interpolation
+        const ax = lastPos.x, ay = lastPos.y;
+        const bx = p.x, by = p.y;
+        const dx = bx - ax;
+        const dy = by - ay;
+        const len = Math.sqrt(dx * dx + dy * dy);
+
+        if (len > 1) {
+          // Pointy slash: small rotated rectangles
+          const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+          const steps = Math.ceil(len / 6);
+
+          for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const ix = ax + dx * t;
+            const iy = ay + dy * t;
+
+            k.add([
+              k.rect(12, 3, { radius: 1 }),
+              k.pos(ix, iy),
+              k.anchor('center'),
+              k.rotate(angle),
+              k.color(0, 0, 0),
+              k.opacity(0.5),
+              k.z(150),
+              k.lifespan(0.10, { fade: 0.05 }),
+            ]);
+          }
+        }
+
+        trySliceBetween(lastPos, p);
+      }
+
+      lastPos = p;
+    });
+
+    // Touch events (mobile) - mirror mouse logic
+    k.onTouchStart((id, pos) => {
+      swiping = true;
+      lastPos = pos;
+      inflationCutsThisSwipe = 0;
+    });
+
+    k.onTouchEnd((id) => {
+      if (!swiping) return;
+      swiping = false;
+
+      // Combo bonus + feedback (same as mouse)
+      const c = inflationCutsThisSwipe;
+      if (c === 2) {
+        addScore(20);
+        toast.show(t('toast_combo_x2'), k.rgb(255, 200, 80), true);
+        playSFX('combo');
+        for (let i = 0; i < 15; i++) {
+          k.add([
+            k.rect(8, 8),
+            k.pos(240, 140),
+            k.anchor('center'),
+            k.color(255, 200, 80),
+            k.opacity(1),
+            k.move(k.rand(0, 360), k.rand(100, 300)),
+            k.lifespan(0.6, { fade: 0.3 }),
+            k.z(200),
+          ]);
+        }
+      }
+      else if (c === 3) {
+        addScore(40);
+        toast.show(t('toast_combo_x3'), k.rgb(255, 180, 60), true);
+        playSFX('combo');
+        for (let i = 0; i < 20; i++) {
+          k.add([
+            k.rect(10, 10),
+            k.pos(240, 140),
+            k.anchor('center'),
+            k.color(255, 180, 60),
+            k.opacity(1),
+            k.move(k.rand(0, 360), k.rand(120, 350)),
+            k.lifespan(0.7, { fade: 0.3 }),
+            k.z(200),
+          ]);
+        }
+      }
+      else if (c >= 4) {
+        addScore(80);
+        toast.show(t('toast_combo_x4'), k.rgb(255, 160, 40), true);
+        playSFX('combo');
+        for (let i = 0; i < 30; i++) {
+          k.add([
+            k.rect(12, 12),
+            k.pos(240, 140),
+            k.anchor('center'),
+            k.color(255, 160, 40),
+            k.opacity(1),
+            k.move(k.rand(0, 360), k.rand(150, 400)),
+            k.lifespan(0.8, { fade: 0.3 }),
+            k.z(200),
+          ]);
+        }
+      }
+
+      inflationCutsThisSwipe = 0;
+      lastPos = null;
+    });
+
+    k.onTouchMove((id, pos) => {
+      if (!swiping) return;
+      const p = pos;
 
       if (lastPos) {
         // Slice trail: continuous line via interpolation
