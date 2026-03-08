@@ -574,9 +574,12 @@ function createScenes(k, preloadedAssets) {
           k.z(3),
         ]));
 
-        // Draw slice line through it
+        // Draw slice line through it (diagonal black rect)
         addObj(k.add([
-          k.line([k.vec2(160, 370), k.vec2(320, 430)], { width: 6 }),
+          k.rect(180, 6),
+          k.pos(240, 400),
+          k.anchor('center'),
+          k.rotate(20),
           k.color(0, 0, 0),
           k.opacity(0.9),
           k.z(4),
