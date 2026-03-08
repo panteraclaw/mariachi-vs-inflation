@@ -543,7 +543,7 @@ function createScenes(k, preloadedAssets) {
       ]));
 
       addObj(k.add([
-        k.text(`${page + 1}/5`, { size: 18 }),
+        k.text(`${page + 1}/6`, { size: 18 }),
         k.pos(240, 640),
         k.anchor('center'),
         k.color(255, 255, 255),
@@ -556,6 +556,65 @@ function createScenes(k, preloadedAssets) {
       clearPage();
 
       if (page === 0) {
+        // NEW PAGE 0: How to slice
+        addObj(k.add([
+          k.text(t('tutorial_0_title'), { size: 22 }),
+          k.pos(240, 260),
+          k.anchor('center'),
+          k.color(255, 255, 255),
+          k.z(3),
+        ]));
+
+        // Show gasolina sprite with a slice line
+        addObj(k.add([
+          k.sprite('gasolina'),
+          k.pos(240, 400),
+          k.anchor('center'),
+          k.scale(0.12),
+          k.z(3),
+        ]));
+
+        // Draw slice line through it
+        addObj(k.add([
+          k.line([k.vec2(160, 370), k.vec2(320, 430)], { width: 6 }),
+          k.color(0, 0, 0),
+          k.opacity(0.9),
+          k.z(4),
+        ]));
+
+        // Arrow/swipe indicator
+        addObj(k.add([
+          k.text('→', { size: 36 }),
+          k.pos(340, 400),
+          k.anchor('center'),
+          k.color(255, 220, 140),
+          k.z(4),
+        ]));
+
+        addObj(k.add([
+          k.text(t('tutorial_0_label_swipe'), { size: 14 }),
+          k.pos(340, 435),
+          k.anchor('center'),
+          k.color(200, 210, 230),
+          k.z(3),
+        ]));
+
+        // Instructions below
+        const bodyY = 520;
+        addObj(k.add([
+          k.text([
+            t('tutorial_0_line1'),
+            t('tutorial_0_line2'),
+            t('tutorial_0_line3'),
+          ].join('\n'), { size: 16, width: 400, lineSpacing: 9, align: 'center' }),
+          k.pos(240, bodyY),
+          k.anchor('center'),
+          k.color(230, 240, 255),
+          k.z(3),
+        ]));
+      }
+
+      if (page === 1) {
         card(t('tutorial_1_title'), [
           t('tutorial_1_line1'),
           t('tutorial_1_line2'),
@@ -566,7 +625,7 @@ function createScenes(k, preloadedAssets) {
         ]);
       }
 
-      if (page === 1) {
+      if (page === 2) {
         card(t('tutorial_2_title'), [
           t('tutorial_2_line1'),
           t('tutorial_2_line2'),
@@ -581,7 +640,7 @@ function createScenes(k, preloadedAssets) {
         ]);
       }
 
-      if (page === 2) {
+      if (page === 3) {
         card(t('tutorial_3_title'), [
           t('tutorial_3_line1'),
           t('tutorial_3_line2'),
@@ -591,7 +650,7 @@ function createScenes(k, preloadedAssets) {
         ]);
       }
 
-      if (page === 3) {
+      if (page === 4) {
         card(t('tutorial_4_title'), [
           t('tutorial_4_line1'),
           t('tutorial_4_line2'),
@@ -606,7 +665,7 @@ function createScenes(k, preloadedAssets) {
         ]);
       }
 
-      if (page === 4) {
+      if (page === 5) {
         card(t('tutorial_5_title'), [
           t('tutorial_5_line1'),
           t('tutorial_5_line2'),
@@ -687,12 +746,12 @@ function createScenes(k, preloadedAssets) {
 
     // Bottom: back/next
     btnStyle(130, 760, t('tutorial_back'), () => {
-      page = (page - 1 + 5) % 5;
+      page = (page - 1 + 6) % 6;
       render();
     });
 
     btnStyle(350, 760, t('tutorial_next'), () => {
-      page = (page + 1) % 5;
+      page = (page + 1) % 6;
       render();
     });
 
@@ -906,10 +965,14 @@ function createScenes(k, preloadedAssets) {
       k.z(2),
     ]);
 
+    const realBTC = scoreToRealBTC(score);
+    const btcFormatted = realBTC.toFixed(8); // 8 decimales estándar BTC
+    
     const summary = [
       t('gameover_saved')(score),
       '',
-      `${t('gameover_btc_saved')}: ${bitcoins}`,
+      `En Bitcoin: ${btcFormatted} BTC`,
+      `(a precio actual: $${BTC_PRICE_MXN.toLocaleString('es-MX')} MXN)`,
     ].join('\n');
 
     k.add([
@@ -1136,9 +1199,16 @@ function createScenes(k, preloadedAssets) {
 
     makeBtn(t('gameover_share'), 525, () => {
       const gameUrl = 'https://mariachi-vs-inflation.vercel.app';
-      const text = encodeURIComponent(
-        `Ahorré $${score} pesos cortando la inflación. BTC guardados: ${bitcoins}. ¿Cuánto podrás ahorrar? ${gameUrl}`
-      );
+      
+      // Rotate between philosophical messages
+      const messages = [
+        `Bitcoin es más que trading: es colaboración ciudadana para enfrentar la crisis.\n\nJugué esto y entendí por qué.\n\n${gameUrl}`,
+        `Aprendí que Bitcoin no es especulación, es preparación colectiva.\n\nEste juego lo explica en minutos.\n\n${gameUrl}`,
+        `El sistema cambia. Bitcoin es infraestructura ciudadana para lo que viene.\n\nEntendí el mensaje jugando esto.\n\n${gameUrl}`,
+      ];
+      
+      const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+      const text = encodeURIComponent(randomMsg);
       const url = `https://twitter.com/intent/tweet?text=${text}`;
       window.open(url, '_blank');
     }, { w: 300 });
@@ -1456,6 +1526,15 @@ function createScenes(k, preloadedAssets) {
     backBtn.onHover(() => k.setCursor('pointer'));
     backBtn.onHoverEnd(() => k.setCursor('default'));
   });
+
+  // ===== BTC PRICE CONFIGURATION =====
+  // Hardcoded BTC price in MXN (update manually)
+  const BTC_PRICE_MXN = 1620000; // ~$90k USD × 18 MXN/USD
+
+  // Convert game score (fictional pesos) to realistic BTC
+  function scoreToRealBTC(score) {
+    return score / BTC_PRICE_MXN;
+  }
 
   // ===== GAME SCENE =====
   k.scene('game', (data) => {

@@ -14,6 +14,12 @@ export const i18n = {
     tutorial_back: 'VOLVER',
     tutorial_menu: 'MENÚ',
     
+    tutorial_0_title: 'CÓMO JUGAR',
+    tutorial_0_line1: 'Desliza tu dedo (móvil) o mouse (PC)',
+    tutorial_0_line2: 'a través de los objetos para cortarlos',
+    tutorial_0_line3: '¡Practica el movimiento de corte!',
+    tutorial_0_label_swipe: 'Cortar →',
+    
     tutorial_1_title: 'OBJETIVO',
     tutorial_1_line1: 'Corta la INFLACIÓN para ahorrar pesos',
     tutorial_1_line2: 'GUARDA / INVIERTE en BITCOIN (no lo cortes)',
@@ -60,22 +66,22 @@ export const i18n = {
     
     // Learn BTC
     learn_btc_title: 'APRENDE BTC',
-    learn_btc_subtitle: 'Por qué Bitcoin protege tu ahorro (simple y directo)',
+    learn_btc_subtitle: 'Arca tecnológica para el cambio monetario',
     
-    learn_1_title: '1) ¿Qué es la inflación?',
-    learn_1_body: 'Inflación = los precios suben con el tiempo.\n\nEso hace que tu dinero compre menos.\n\nAunque ahorres, tu poder adquisitivo puede caer.',
+    learn_1_title: '1) El sistema monetario está cambiando',
+    learn_1_body: 'El dinero como lo conocemos está en transición.\n\nEl dólar pierde respaldo. La geopolítica se fractura. Los modelos económicos que funcionaron décadas ya no sostienen.\n\nEsto no es teoría. Es lo que vivimos.',
     
-    learn_2_title: '2) ¿Qué es Bitcoin?',
-    learn_2_body: 'Bitcoin es dinero digital global.\n\nTiene oferta fija: solo existirán 21M BTC.\n\nNadie puede "imprimir" más para devaluarlo.',
+    learn_2_title: '2) Por qué necesitamos alternativa',
+    learn_2_body: 'El dinero tradicional depende de promesas. Bancos, gobiernos, intermediarios que pueden fallar.\n\nCuando el sistema se agota, ¿dónde va tu trabajo? ¿Dónde guardas décadas de esfuerzo?\n\nLa pregunta ya no es "si" cambia, sino "cómo nos preparamos".',
     
-    learn_3_title: '3) ¿Por qué es refugio vs inflación?',
-    learn_3_body: 'Si algo es escaso y la demanda crece, su valor tiende a sostenerse o subir.\n\nEl dinero tradicional (pesos, dólares) suele emitirse más con el tiempo → tu ahorro se diluye.\n\nBitcoin es escaso por diseño → puede proteger tu ahorro a largo plazo.',
+    learn_3_title: '3) Bitcoin como arca tecnológica',
+    learn_3_body: 'Bitcoin no es para "invertir". Es infraestructura para el cambio monetario.\n\nFunciona sin promesas, solo con matemática y código abierto. Nadie lo controla. Todos lo verificamos.\n\nEs refugio técnico ante lo que viene. No es especulación. Es preparación.',
     
-    learn_4_title: '4) Coordinación ciudadana descentralizada',
-    learn_4_body: 'No depende de un banco o gobierno.\n\nMiles de nodos verifican reglas y evitan trampas.\n\nEs una red abierta: cualquiera puede participar y validar.',
+    learn_4_title: '4) Cómo funciona (red abierta)',
+    learn_4_body: 'Miles de nodos verifican transacciones. Nadie da órdenes. Las reglas son código.\n\nNo pides permiso para usar Bitcoin. No depende de un gobierno o corporación.\n\nEs coordinación ciudadana global. Construida por todos, para todos.',
     
-    learn_5_title: '5) En este juego (resumen)',
-    learn_5_body: 'Corta INFLACIÓN para ahorrar pesos.\n\nGUARDA/INVIERTE en BTC: déjalo pasar (+50).\n\nSi cortas BTC: pierdes 1 vida completa.\n\nTip: activa "mensajes educativos" en ⚙ para aprender jugando.',
+    learn_5_title: '5) Invitación a sumarse',
+    learn_5_body: 'El arca está abierta. No es tarde. No necesitas ser experto.\n\nEntender esto es el primer paso. Usarlo es el segundo. Enseñarlo es el tercero.\n\nPreparémonos juntos para el cambio que ya comenzó.',
     
     // Game UI
     game_score: 'Score',
@@ -154,6 +160,12 @@ export const i18n = {
     tutorial_back: 'BACK',
     tutorial_menu: 'MENU',
     
+    tutorial_0_title: 'HOW TO PLAY',
+    tutorial_0_line1: 'Swipe your finger (mobile) or mouse (PC)',
+    tutorial_0_line2: 'through objects to slice them',
+    tutorial_0_line3: 'Practice the slicing motion!',
+    tutorial_0_label_swipe: 'Slice →',
+    
     tutorial_1_title: 'OBJECTIVE',
     tutorial_1_line1: 'Slash INFLATION to save pesos',
     tutorial_1_line2: 'SAVE / INVEST in BITCOIN (don\'t cut it)',
@@ -200,22 +212,22 @@ export const i18n = {
     
     // Learn BTC
     learn_btc_title: 'LEARN BTC',
-    learn_btc_subtitle: 'Why Bitcoin protects your savings (simple & direct)',
+    learn_btc_subtitle: 'Technological ark for monetary transition',
     
-    learn_1_title: '1) What is inflation?',
-    learn_1_body: 'Inflation = prices rise over time.\n\nThis makes your money buy less.\n\nEven if you save, your purchasing power can fall.',
+    learn_1_title: '1) The monetary system is changing',
+    learn_1_body: 'Money as we know it is in transition.\n\nThe dollar loses backing. Geopolitics fractures. Economic models that worked for decades no longer hold.\n\nThis is not theory. This is what we live.',
     
-    learn_2_title: '2) What is Bitcoin?',
-    learn_2_body: 'Bitcoin is global digital money.\n\nFixed supply: only 21M BTC will ever exist.\n\nNo one can "print" more to devalue it.',
+    learn_2_title: '2) Why we need an alternative',
+    learn_2_body: 'Traditional money depends on promises. Banks, governments, intermediaries that can fail.\n\nWhen the system exhausts, where does your work go? Where do you keep decades of effort?\n\nThe question is no longer "if" it changes, but "how we prepare".',
     
-    learn_3_title: '3) Why is it a hedge vs inflation?',
-    learn_3_body: 'If something is scarce and demand grows, its value tends to hold or rise.\n\nTraditional money (pesos, dollars) tends to expand over time → your savings dilute.\n\nBitcoin is scarce by design → can protect your savings long-term.',
+    learn_3_title: '3) Bitcoin as technological ark',
+    learn_3_body: 'Bitcoin is not for "investing". It is infrastructure for monetary change.\n\nIt works without promises, only with mathematics and open code. No one controls it. We all verify it.\n\nIt is technical shelter for what comes. Not speculation. Preparation.',
     
-    learn_4_title: '4) Decentralized citizen coordination',
-    learn_4_body: 'Doesn\'t depend on a bank or government.\n\nThousands of nodes verify rules and prevent cheating.\n\nIt\'s an open network: anyone can participate and validate.',
+    learn_4_title: '4) How it works (open network)',
+    learn_4_body: 'Thousands of nodes verify transactions. No one gives orders. The rules are code.\n\nYou don\'t ask permission to use Bitcoin. It doesn\'t depend on a government or corporation.\n\nIt is global citizen coordination. Built by all, for all.',
     
-    learn_5_title: '5) In this game (summary)',
-    learn_5_body: 'Cut INFLATION to save pesos.\n\nSAVE/INVEST in BTC: let it pass (+50).\n\nIf you cut BTC: lose 1 full life.\n\nTip: enable "educational messages" in ⚙ to learn while playing.',
+    learn_5_title: '5) Invitation to join',
+    learn_5_body: 'The ark is open. It is not late. You don\'t need to be an expert.\n\nUnderstanding this is the first step. Using it is the second. Teaching it is the third.\n\nLet us prepare together for the change that already began.',
     
     // Game UI
     game_score: 'Score',
