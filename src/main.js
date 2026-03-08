@@ -533,7 +533,7 @@ function createScenes(k, preloadedAssets) {
       }
 
       // Body text sits below icon grid (or near top if no icons)
-      const bodyY = items.length === 0 ? 420 : (330 + rows * 95 + 70);
+      const bodyY = items.length === 0 ? 400 : (330 + rows * 95 + 70);
       addObj(k.add([
         k.text(lines.join('\n'), { size: 16, width: 400, lineSpacing: 9, align: 'center' }),
         k.pos(240, bodyY),
@@ -544,7 +544,7 @@ function createScenes(k, preloadedAssets) {
 
       addObj(k.add([
         k.text(`${page + 1}/6`, { size: 18 }),
-        k.pos(240, 640),
+        k.pos(240, 700),
         k.anchor('center'),
         k.color(255, 255, 255),
         k.opacity(0.7),
@@ -574,36 +574,8 @@ function createScenes(k, preloadedAssets) {
           k.z(3),
         ]));
 
-        // Draw slice line through it (diagonal black rect)
-        addObj(k.add([
-          k.rect(180, 6),
-          k.pos(240, 400),
-          k.anchor('center'),
-          k.rotate(20),
-          k.color(0, 0, 0),
-          k.opacity(0.9),
-          k.z(4),
-        ]));
-
-        // Arrow/swipe indicator
-        addObj(k.add([
-          k.text('→', { size: 36 }),
-          k.pos(340, 400),
-          k.anchor('center'),
-          k.color(255, 220, 140),
-          k.z(4),
-        ]));
-
-        addObj(k.add([
-          k.text(t('tutorial_0_label_swipe'), { size: 14 }),
-          k.pos(340, 435),
-          k.anchor('center'),
-          k.color(200, 210, 230),
-          k.z(3),
-        ]));
-
         // Instructions below
-        const bodyY = 520;
+        const bodyY = 480;
         addObj(k.add([
           k.text([
             t('tutorial_0_line1'),
