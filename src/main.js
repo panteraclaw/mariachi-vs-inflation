@@ -1396,9 +1396,10 @@ function createScenes(k, preloadedAssets) {
           if (o.text === t('leaderboard_loading')) k.destroy(o);
         });
 
-        const lines = rows.slice(0, 10).map((r, i) =>
-          `${i+1}. ${r.name}: ${r.score} pts (${r.bitcoins} BTC)`
-        ).join('\n');
+        const lines = rows.slice(0, 10).map((r, i) => {
+          const realBTC = scoreToRealBTC(r.score).toFixed(8);
+          return `${i+1}. ${r.name}: $${r.score} MXN (${realBTC} BTC)`;
+        }).join('\n');
 
         k.add([
           k.text(lines || 'Sin registros', { size: 18, width: 420, lineSpacing: 8 }),
